@@ -10,6 +10,8 @@ import pyvirtualcam
 import numpy as np
 import pathlib
 import os
+import win32api
+
 # Constants
 IMG_W = 640
 IMG_H = 480
@@ -18,6 +20,10 @@ SLEEPING_THRESHOLD = 10
 USER_THRESHOLD = 10
 BLUR_TEXT = 'Personal Stuff Happening'
 SLEEPING_TEXT = 'BLURED BECAUSE SLEEPING'
+WM_APPCOMMAND = 0x319
+APPCOMMAND_MIC_MAX = 0x1a
+APPCOMMAND_MIC_MIN = 0x19
+
 
 class VirtualWebcam():
     
@@ -52,7 +58,7 @@ class VirtualWebcam():
 
         counter = 0
 
-        with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=30) as cam:
+        with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=15) as cam:
             print("Running")
             while True:
                 if counter == 30:
@@ -111,6 +117,7 @@ class VirtualWebcam():
         if (self.noFaceDetected > ERROR_THRESHOLD):
             frame = self.getBlockFrame(frame, sleeping, currentUser)
         else:
+            win32api.SendMessage(-1, WM_APPCOMMAND, 0x30292, APPCOMMAND_MIC_MAX * 0x10000)
             self.blurredImg = None
         
         
@@ -199,18 +206,23 @@ class VirtualWebcam():
             return self.errImg
         
         if (self.blurredImg is None):
-            # blur the Image
-            self.blurredImg = cv.blur(frame, (131,131))
+            win32api.SendMessage(-1, WM_APPCOMMAND, 0x30292, APPCOMMAND_MIC_MIN * 0x10000)
             
-            # Display different text if sleeping or not
-            text = (BLUR_TEXT, SLEEPING_TEXT)[sleeping]
-            
-            # Display different currentUser text
-            text = (text, "NOT JONATHAN")[currentUser]
-            
-            
-            # Add text to the image
-            self.blurredImg = cv.putText(self.blurredImg, text, (20, IMG_H//2), cv.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv.LINE_AA)
+            if (self.errImg is not None):
+                self.blurredImg = self.errImg
+            else:
+                # blur the Image
+                self.blurredImg = cv.blur(frame, (131,131))
+                
+                # Display different text if sleeping or not
+                text = (BLUR_TEXT, SLEEPING_TEXT)[sleeping]
+                
+                # Display different currentUser text
+                text = (text, "NOT JONATHAN")[currentUser]
+                
+                
+                # Add text to the image
+                self.blurredImg = cv.putText(self.blurredImg, text, (20, IMG_H//2), cv.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv.LINE_AA)
 
         return self.blurredImg
     
