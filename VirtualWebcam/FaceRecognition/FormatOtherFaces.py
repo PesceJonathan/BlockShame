@@ -14,7 +14,7 @@ IMG_H = 480
 
 face_cascade = cv.CascadeClassifier('../Haarcascades/haarcascade_frontalface_default.xml')
 
-path = './OtherFaces'
+path = '../Data/OtherFaces'
 features = []
 
 length = len(os.listdir(path))
@@ -28,6 +28,9 @@ for img in os.listdir(path):
     img_path = os.path.join(path, img)
     img = cv.imread(img_path)
     features.extend(formatImage(img, face_cascade))
+    
+    if (counter == 200):
+        break
     
     
 # Save the array as a file

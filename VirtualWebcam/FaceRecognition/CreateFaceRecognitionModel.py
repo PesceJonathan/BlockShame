@@ -24,11 +24,11 @@ class CreateFaceRecognitionModel():
         if (video_feed.isOpened() == False):
             return "ERROR - Could not connect to webcam!!!"
         
-        while len(self.dataSet) < 100:
+        while len(self.dataSet) < 50:
             # Read the frame
             isTrue, frame = video_feed.read()
             self.dataSet.append(frame)
-            cv.waitKey(100)
+            cv.waitKey(300)
             print(str(len(self.dataSet)))
         
         

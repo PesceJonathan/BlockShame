@@ -15,21 +15,29 @@ ERROR_THRESHOLD = 5
 
 class VirtualWebcam():
     
-    def __init__(self,  errImgPath=None, notPresent=False, isSleeping=False, controlMic=False):
+    def __init__(self,  errImgPath=None, notPresent=False, isSleeping=False, controlMic=False, faceRecognition=False):
         self.notPresent = notPresent
         self.isSleeping = isSleeping
         self.controlMic = controlMic
         self.errImg = (None, cv.imread(errImgPath))[errImgPath is not None]
         self.blockFrame = None
         self.notPresentCounter = 0
+        self.NotUser = False
         
         # Import all the cascades
         self.face_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_frontalface_default.xml')
         self.open_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_eye.xml')
         self.right_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_righteye_2splits.xml')
         self.left_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_lefteye_2splits.xml')
-        
-        
+        if (faceRecognition):
+            print("NOT NONE")
+            self.face_recognizer = cv.face.LBPHFaceRecognizer_create()
+            self.face_recognizer.read(str(pathlib.Path(__file__).resolve().parent)  + '/Data/JonathanPesce_Model.yml')
+        else:
+            self.face_recognizer = None
+            
+            
+            
     def start(self):
         # Use OpenCV to grab the webcam video feed
         video_feed = cv.VideoCapture(0) 
@@ -42,7 +50,7 @@ class VirtualWebcam():
             counter = 0
             while True:
                 frame = self.processFrame(video_feed, counter)
-                counter = (counter + 1, 0)[counter == 5]
+                counter = (counter + 1, 0)[counter == 30]
                 
                 # Send to virtual cam
                 cam.send(frame)
@@ -61,8 +69,8 @@ class VirtualWebcam():
         # Read the frame from the webcam
         isTrue, frame = video_feed.read()
         
-        if (counter == 5):
-            if (self.updateShouldShowCame(frame) == False):
+        if (counter % 5 == 0):
+            if (self.updateShouldShowCame(frame, counter % 15 == 0 and self.face_recognizer is not None) == False):
                 frame = self.getBlockFrame(frame, self.notPresent)
             elif (self.blockFrame is not None):
                 self.blockFrame = None
@@ -81,8 +89,8 @@ class VirtualWebcam():
     
     
     
-    def updateShouldShowCame(self, frame):
-        if (self.notPresent == False and self.isSleeping == False):
+    def updateShouldShowCame(self, frame, checkFace):
+        if (self.notPresent == False and self.isSleeping == False and checkFace == False):
             return True
         
         # Convert the frame to grayscale
@@ -93,6 +101,21 @@ class VirtualWebcam():
         
         # Check based on restrictions passed in if conditions to turn off are met
         shouldTurnOff = False
+        
+        if (checkFace):
+            for (x,y,w,h) in face_rects:
+                faces_roi = frame_gray[y:y+h, x:x+w]
+                label, confidence = self.face_recognizer.predict(faces_roi)
+                
+                if (label != 1):
+                    print("NOT USER")
+                    self.NotUser = False
+                    return False
+                else:
+                    print("Is User")
+                    self.NotUser = True
+                    
+                    
         
         # If user is not present turn off the webcam
         if (self.notPresent and len(face_rects) < 1):
@@ -162,7 +185,7 @@ class VirtualWebcam():
         while True:
             frame = self.processFrame(video_feed, counter, isPython=True)
             
-            counter = (counter + 1, 0)[counter == 5]
+            counter = (counter + 1, 0)[counter == 30]
             
             cv.imshow('Title', frame) 
             cv.waitKey(1)
@@ -191,6 +214,6 @@ def convert2RGBA(frame):
     cv.flip(out_frame_rgba, -1)
     return out_frame_rgba
 
-t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png')
+t = VirtualWebcam(notPresent=False, isSleeping=False, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=True)
 #t.startPython()
 t.start()

@@ -6,39 +6,47 @@ Created on Sat Jan 30 02:48:31 2021
 """
 import cv2 as cv
 from FormatImage import formatImage
-
-# face_recognizer = cv.face.LBPHFaceRecognizer_create()
-# face_recognizer.read('../Data/JonathanPesce_Model.yml')
+import pandas as pd
 
 # Import the face cascade
 face_cascade = cv.CascadeClassifier('../Haarcascades/haarcascade_frontalface_default.xml')
+face_recognizer = cv.face.LBPHFaceRecognizer_create()
+face_recognizer.read('../Data/JonathanPesce_Model.yml')
 
-hand_cascade = cv.CascadeClassifier('../Haarcascades/haar_hand_v2.xml')
-fist_cascade = cv.CascadeClassifier('../Haarcascades/haar_fist.xml')
-palm_cascade = cv.CascadeClassifier('../Haarcascades/haar_palm.xml')
+# # Use OpenCV to grab the webcam video feed
+# video_feed = cv.VideoCapture(0)
+
+frames = []
+
+data = pd.read_csv('VideoForTesting.csv')
+data['Frames'].apply(lambda frame: frames.append(frame))
+
+
+
+def run(ttt):
+    for frame in ttt:
+        frame = frame[0]
+        frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        faces_rect = face_cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=20)
         
-# Use OpenCV to grab the webcam video feed
-video_feed = cv.VideoCapture(0)
-
-while True:
-    # Read the frame
-    isTrue, frame = video_feed.read()
+        height = 460
+        
+        for (x,y,w,h) in faces_rect:
+            faces_roi = frame_gray[y:y+h, x:x+w]
+            label, confidence = face_recognizer.predict(faces_roi)
+           
+            person = ("Jonathan", "Dad")[label == 0]
+           
+            frame = cv.putText(frame, f"{person} with confidence {confidence}", (20, 460), cv.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv.LINE_AA)
+            height = height - 20
+           
+        cv.imshow("Frame", frame)    
+        frames.append(frame)
+        cv.waitKey(1)
     
-    frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    rects_hands = face_cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=20)
-
-    # Draw the rectangles for debugging purposes
-    for (x,y,w,h) in rects_hands:
-        cv.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), thickness=1)
     
-
-    cv.imshow("Frame", frame)    
-    cv.waitKey(1)
-
-
-cv.waitKey(0)
-video_feed.release()
-cv.destroyAllWindows()
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
 
 
