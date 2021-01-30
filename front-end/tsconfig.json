@@ -1,42 +1,23 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "moduleResolution": "node",
-    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
     "jsx": "react",
-    "lib": [
-      "dom",
-      "es6",
-      "dom.iterable",
-      "scripthost"
-    ],
-    "types": [],
-
-    "alwaysStrict": true,
-    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "_/*": ["src/*"],
+      "_public/*": ["public/*"],
+      "_main/*": ["src/main/*"],
+      "_models/*": ["src/models/*"],
+      "_renderer/*": ["src/renderer/*"],
+      "_utils/*": ["src/utils/*"]
+    },
+    "module": "commonjs",
+    "moduleResolution": "node",
     "noImplicitAny": true,
-    "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noUnusedLocals": true,
-    
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-
+    "strictNullChecks": true,
     "sourceMap": true,
-
-    "outDir": "dist"
+    "target": "esnext"
   },
-  "files": [
-    "app/index.tsx"
-  ],
-  "include": [
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "test/**/*.ts",
-    "test/**/*.tsx",
-    "node_modules/@types/**/*.d.ts"
-  ],
-  "exclude": [
-    "dist"
-  ]
+  "exclude": ["node_modules"]
 }
