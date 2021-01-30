@@ -1,213 +1,155 @@
-# electron-react-typescript-boilerplate
+# Electron-React-TypeScript-Webpack-Boilerplate
+Pre-configured Electron.js + React.js + TypeScript boilerplate with 
+Webpack v5 & linters config predefined.
 
-[![Build Status][travis-image]][travis-url]
-[![Greenkeeper badge](https://badges.greenkeeper.io/iRath96/electron-react-typescript-boilerplate.svg)](https://greenkeeper.io/)
+This boilerplate currently works on macOS and Windows. If something doesn't 
+work, please [file an issue](https://github.com/Devtography/electron-react-typescript-webpack-boilerplate/issues/new).
 
-This is a slight modificiation of the great [electron-react-boilerplate](https://github.com/chentsulin/electron-react-boilerplate) by chentsulin.
-Instead of [Babel](https://babeljs.io) and [flow](https://flowtype.org) this version uses [TypeScript](https://www.typescriptlang.org). Support for [Sass](http://sass-lang.com) has also been added.
-
-# electron-react-boilerplate
-
-![](./erb-logo.png)
-
-> Live editing development on desktop app
-
-[Electron](http://electron.atom.io/) application boilerplate based on [React](https://facebook.github.io/react/), [Redux](https://github.com/reactjs/redux), [React Router](https://github.com/reactjs/react-router), [Webpack](http://webpack.github.io/docs/), [React Transform HMR](https://github.com/gaearon/react-transform-hmr) for rapid application development
-
-## Screenshot
-
-![Electron Boilerplate Demo](https://cloud.githubusercontent.com/assets/3382565/10557547/b1f07a4e-74e3-11e5-8d27-79ab6947d429.gif)
-
-## Install
-
-* **Note: requires a node version >= 6 and an npm version >= 3.**
-* **If you have installation or compilation issues with this project, please see [our debugging guide](https://github.com/chentsulin/electron-react-boilerplate/issues/400)**
-
-First, clone the repo via git:
-
-```bash
-git clone https://github.com/iRath96/electron-react-typescript-boilerplate.git your-project-name
-```
-
-And then install dependencies.
-**ProTip**: Install with [yarn](https://github.com/yarnpkg/yarn) for faster and safer installation
-
-```bash
-$ cd your-project-name && npm install
-```
-
-:bulb: *In order to remove boilerplate sample code, simply run `npm run cleanup`. After this is run, the initial sample boilerplate code will be removed in order for a clean project for starting custom dev*
-
-## Run
-
-Run these two commands __simultaneously__ in different console tabs.
-
-```bash
-$ npm run hot-server
-$ npm run start-hot
-```
-
-or run two servers with one command
-
-```bash
-$ npm run dev
-```
-
-## Editor Configuration
-**Atom**
-```bash
-apm install editorconfig es6-javascript atom-ternjs javascript-snippets linter linter-eslint language-babel autocomplete-modules
-```
-
-**Sublime**
-* https://github.com/sindresorhus/editorconfig-sublime#readme
-* https://github.com/SublimeLinter/SublimeLinter3
-* https://github.com/roadhump/SublimeLinter-eslint
-* https://github.com/babel/babel-sublime
-
-**Others**
-* [Editorconfig](http://editorconfig.org/#download)
-* [ESLint](http://eslint.org/docs/user-guide/integrations#editors)
-* Babel Syntax Plugin
-
-## DevTools
-
-#### Toggle Chrome DevTools
-
-- OS X: <kbd>Cmd</kbd> <kbd>Alt</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-- Linux: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-- Windows: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-
-*See [electron-debug](https://github.com/sindresorhus/electron-debug) for more information.*
-
-#### DevTools extension
-
-This boilerplate is included following DevTools extensions:
-
-* [Devtron](https://github.com/electron/devtron) - Install via [electron-debug](https://github.com/sindresorhus/electron-debug).
-* [React Developer Tools](https://github.com/facebook/react-devtools) - Install via [electron-devtools-installer](https://github.com/GPMDP/electron-devtools-installer).
-* [Redux DevTools](https://github.com/zalmoxisus/redux-devtools-extension) - Install via [electron-devtools-installer](https://github.com/GPMDP/electron-devtools-installer).
-
-You can find the tabs on Chrome DevTools.
-
-If you want to update extensions version, please set `UPGRADE_EXTENSIONS` env, just run:
-
-```bash
-$ UPGRADE_EXTENSIONS=1 npm run dev
-
-# For Windows
-$ set UPGRADE_EXTENSIONS=1 && npm run dev
-```
-
-
-
-## CSS Modules
-
-This boilerplate out of the box is configured to use [css-modules](https://github.com/css-modules/css-modules).
-
-All `.css` file extensions will use css-modules unless it has `.global.css`.
-
-If you need global styles, stylesheets with `.global.css` will not go through the
-css-modules loader. e.g. `app.global.css`
-
-If you want to import global css libraries (like `bootstrap`), you can just write the following code in `.global.css`:
-
-```css
-@import "~bootstrap/dist/css/bootstrap.css";
-```
-
-
-## Packaging
-
-To package apps for the local platform:
-
-```bash
-$ npm run package
-```
-
-To package apps for all platforms:
-
-First, refer to [Multi Platform Build](https://github.com/electron-userland/electron-builder/wiki/Multi-Platform-Build) for dependencies.
-
-Then,
-```bash
-$ npm run package-all
-```
-
-To package apps with options:
-
-```bash
-$ npm run package -- --[option]
-```
-
-## Further commands
-
-To run the application without packaging run
-
-```bash
-$ npm run build
-$ npm start
-```
-
-To run End-to-End Test
-
-```bash
-$ npm run build
-$ npm run test-e2e
-```
-
-#### Options
-
-See [electron-builder CLI Usage](https://github.com/electron-userland/electron-builder#cli-usage)
-
-#### Module Structure
-
-This boilerplate uses a [two package.json structure](https://github.com/electron-userland/electron-builder#two-packagejson-structure).
-
-1. If the module is native to a platform or otherwise should be included with the published package (i.e. bcrypt, openbci), it should be listed under `dependencies` in `./app/package.json`.
-2. If a module is `import`ed by another module, include it in `dependencies` in `./package.json`.   See [this ESLint rule](https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-extraneous-dependencies.md).
-3. Otherwise, modules used for building, testing and debugging should be included in `devDependencies` in `./package.json`.
-
-## Static Type Checking
-This project comes with Flow support out of the box! You can annotate your code with types, [get Flow errors as ESLint errors](https://github.com/amilajack/eslint-plugin-flowtype-errors), and get [type errors during runtime](https://github.com/gcanti/babel-plugin-tcomb-boilerplate) during development. Types are completely optional.
-
-## Native-like UI
-
-If you want to have native-like User Interface (OS X El Capitan and Windows 10), [react-desktop](https://github.com/gabrielbull/react-desktop) may perfect suit for you.
-
-## Dispatching redux actions from main process
-
-see discusses in [#118](https://github.com/chentsulin/electron-react-boilerplate/issues/118) and [#108](https://github.com/chentsulin/electron-react-boilerplate/issues/108)
-
-## How to keep the boilerplate updated
-
-If your application is a fork from this repo, you can add this repo to another git remote:
-
+## Getting started
 ```sh
-git remote add upstream https://github.com/chentsulin/electron-react-boilerplate.git
+// execute
+git clone https://github.com/iamWing/electron-react-typescript-base-proj.git
 ```
 
-Then, use git to merge some latest commits:
+```json
+// edit the following fields in package.json for your own project
+{
+  "name": your-project-name,
+  "version": whatever-you-like,
+  "description": your-own-description,
+  "build": {
+    "appId": your-app-id,
+    "productName": your-product-name,
+    "buildVersion": your-build-number
+  },
+  "author": who's-the-author?,
+  "license": if-you-don't-want-to-use-MIT,
+  "repository": type-and-link-of-your-repo,
+  "keywords": keywords-of-your-project,
+  "bugs": issue-page-of-your-repo,
+  "homepage": homepage-of-your-repo
+}
+```
 
+Then install all the `node_modules` needed by executing the following command:
 ```sh
-git pull upstream master
+cd folder-containing-the-cloned-boilerplate
+npm install --also-dev
 ```
 
-## Maintainers
+Finally execute the following command to start Webpack in development mode and 
+watch the changes on source files for live rebuild on code changes.
+```sh
+npm run dev
+```
 
-- [C. T. Lin](https://github.com/chentsulin)
-- [Jhen-Jie Hong](https://github.com/jhen0409)
-- [Amila Welihinda](https://github.com/amilajack)
+The `npm run dev` command won't start your app and get your app shows on the 
+screen. To start your app, execute the following command:
+```sh
+npm start
+```
 
+## Building the installer for your Electron app
+The boilerplate is currently configured to package & build the installer of 
+your app for macOS & Windows using `electron-builder`. 
+
+For macOS, execute:
+```sh
+npm run prod
+npm run build:mac
+```
+
+For Windows, execute:
+```sh
+npm run prod
+npm run build:win
+```
+_**`asar` archiving may cause errors while running the installed Electron app 
+based on pervious experiences, whereas the macOS build with `asar` enabled 
+works just fine. You can turn it off by changing `asar` to `false` in
+`package.json` line 26.**_
+
+### Extra options
+The build scripts are pre-configured to build 64 bit installers since 64 bit 
+should be the standard for a modern applications. 32 bit builds are still 
+possible by changing the build scripts in `package.json` as below:
+```json
+// from
+"scripts": {
+    ...
+    "build:win": "electron-builder build --win --x64",
+    "build:mac": "electron-builder build --mac --x64"
+},
+
+// to
+"scripts": {
+    ...
+    "build:win": "electron-builder build --win --ia32",
+    // Works only on macOS version < 10.15
+    "build:mac": "electron-builder build --mac --ia32"
+},
+```
+
+Builds for Linux, armv71, and arm64 can also be configured by modifying the 
+build scripts in `package.json`, but those aren't tested yet. For details, 
+please refer to [documents of `electron-builder`](https://www.electron.build/cli).
+
+## Known issues
+1. As Apple introduced the [notarization requirements] with the public release
+   of `macOS 10.14.5`, apps built for `macOS` are now needed to be signed with
+   a valid Developer ID certificate and let Apple notarizes it for you. This
+   boilerplate doesn't include the notarization setup as of the `3.0.0` release,
+   but up until now, you should still be able to run your Electron app by
+   allowing your app to be opened in `System Preferences -> Security & Privacy
+   -> General` without notarizing it for still (tested on `macOS 11.1`).
+
+   If you want to notarization your app using this boilerplate before those
+   settings are included in the future updates, you can try follow the guides on
+   issue [electron-builder #3870].
+
+2. [`electron-builder@22.10.4`] added Apple Silicon and universal binary
+   supports, but it's still a pre-release instead of a stable one so the one
+   included in this boilerplate is still staying on `22.9.1` which doesn't
+   support building the universal binary yet.
+
+## Folder structure
+```
+electron-react-typescript-base-proj/
+| - dist/               //- Generated by Webpack automatically
+| - node_modules/
+| - out/                //- Generated by build script automatically
+| - public/             //- Global static assets
+| | - index.html
+| | - style.css
+| - src/
+| | - main/             //- Backend modules for the Electron app
+| | | - main.ts         //- Entry point of 'electron-main'
+| | - models/
+| | - renderer/         //- Frontend React components for the Electron app
+| | | - renderer.tsx    //- Entry point of 'electron-renderer'
+| | - utils/            //- Common utilities
+| - test/               //- Unit tests
+| - .eslintrc           //- ESLint config
+| - .gitignore
+| - package-lock.json
+| - package.json
+| - tsconfig.json       //- TypeScript config
+| - webpack.config.js   //- Webpack config
+```
+
+## Author
+[Wing Chau](https://github.com/iamWing) [@Devtography](https://github.com/Devtography)
+
+## Donation
+I do this open source work for free in my free time. If you'd like me to invest
+more time on it, please consider give me some [donations]. Any donation is
+gonna be a great motivation for me.
 
 ## License
-MIT © [C. T. Lin](https://github.com/chentsulin)
+Electron React TypeScript Webpack Boilerplate is open source software 
+[licensed as MIT](LICENSE).
 
-[npm-image]: https://img.shields.io/npm/v/electron-react-boilerplate.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/electron-react-boilerplate
-[travis-image]: https://travis-ci.org/iRath96/electron-react-typescript-boilerplate.svg?branch=master
-[travis-url]: https://travis-ci.org/iRath96/electron-react-typescript-boilerplate
-[appveyor-image]: https://ci.appveyor.com/api/projects/status/github/chentsulin/electron-react-boilerplate?svg=true
-[appveyor-url]: https://ci.appveyor.com/project/chentsulin/electron-react-boilerplate/branch/master
-[david_img]: https://img.shields.io/david/chentsulin/electron-react-boilerplate.svg
-[david_site]: https://david-dm.org/chentsulin/electron-react-boilerplate
+[notarization requirements]: https://developer.apple.com/news/?id=04102019a
+[electron-builder #3870]: https://github.com/electron-userland/electron-builder/issues/3870
+[`electron-builder@22.10.4`]: https://github.com/electron-userland/electron-builder/releases/tag/v22.10.4
+[donations]: https://github.com/sponsors/iamWing
