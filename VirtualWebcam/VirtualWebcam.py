@@ -15,9 +15,10 @@ ERROR_THRESHOLD = 5
 
 class VirtualWebcam():
     
-    def __init__(self,  errImgPath=None, notPresent=False, isSleeping=False):
+    def __init__(self,  errImgPath=None, notPresent=False, isSleeping=False, controlMic=False):
         self.notPresent = notPresent
         self.isSleeping = isSleeping
+        self.controlMic = controlMic()
         self.errImg = (None, cv.imread(errImgPath))[errImgPath is not None]
         self.blockFrame = None
         self.notPresentCounter = 0
@@ -255,8 +256,10 @@ class VirtualWebcam():
             if (self.updateShouldShowCame(frame) == False):
                 frame = self.getBlockFrame(frame, self.notPresent)
             elif (self.blockFrame is not None):
-                turnOnMic()
                 self.blockFrame = None
+                
+                if (self.controlMic):
+                turnOnMic()
         elif (self.blockFrame is not None):
             frame = self.blockFrame
         
@@ -309,7 +312,8 @@ class VirtualWebcam():
                 self.blockFrame = cv.putText(self.blockFrame, 'LEFT THE SCREEN', (20, IMG_H//2), cv.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv.LINE_AA)
         
         # Turn off the mic 
-        turnOffMic()
+        if (self.controlMic):
+            turnOffMic()
         
         return self.blockFrame
     
