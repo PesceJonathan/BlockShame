@@ -1,5 +1,6 @@
 import {spawn} from 'child_process'
 import path from 'path'
+import {io, Socket} from 'socket.io-client'
 
 export function startProgram(){
     let python = spawn('python', ['../VirtualWebcam/VirtualWebcam.py']);
@@ -14,4 +15,26 @@ export function startProgram(){
     python.on('close', (code) => {
         console.log(`child process exited with code ${code}`);
     });
+}
+
+let socket : null | Socket = null;
+export function connect(): Promise<void>{
+    return new Promise((res, rej) => {
+        socket = io('http://localhost:5000');
+        // if(socket != null){
+        //     socket.onopen = (ev: Event) => {
+        //         res();
+        //     }
+        // }
+        socket.on('connect', ()=> {
+            console.log("HI");
+            res();
+        })
+    })
+}
+
+export function sendMessage(obj: any, event="setting_change") {
+    if(socket){
+        socket.emit(event, obj);
+    }
 }

@@ -41,6 +41,7 @@ interface Props {
   optionName: string;
   optionDescription?: string;
   toggled?: boolean;
+  onToggle: (value: boolean) => void;
 }
 const MenuItem = (props: Props) => {
   const classes = useStyles(props);
@@ -56,7 +57,10 @@ const MenuItem = (props: Props) => {
         <Switch
           classes={classes}
           checked={toggled}
-          onChange={(e) => setToggled(e.target.checked)}
+          onChange={(e) => {
+            setToggled(e.target.checked)
+            props.onToggle(e.target.checked)
+          }}
         />
       </SwitchContainer>
     </MenuItemStyled>
