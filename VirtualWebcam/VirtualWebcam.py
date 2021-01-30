@@ -14,14 +14,13 @@ IMG_W = 640
 IMG_H = 480
 ERROR_THRESHOLD = 40
 SLEEPING_THRESHOLD = 10
+USER_THRESHOLD = 10
 BLUR_TEXT = 'Personal Stuff Happening'
 SLEEPING_TEXT = 'BLURED BECAUSE SLEEPING'
-
 
 class VirtualWebcam():
     
     def __init__(self, errImgPath=None, checkSleep=False):
-        #self.face_cascade = cv.CascadeClassifier('./Haarcascades/haar_face.xml')
         self.face_cascade = cv.CascadeClassifier('./Haarcascades/haarcascade_frontalface_default.xml')
         self.open_eyes_cascade = cv.CascadeClassifier('./Haarcascades/haarcascade_eye.xml')
         self.right_eyes_cascade = cv.CascadeClassifier('./Haarcascades/haarcascade_righteye_2splits.xml')
@@ -30,9 +29,14 @@ class VirtualWebcam():
         self.noFaceDetected = 0
         self.isSleeping = False
         self.sleepCounter = 0
+        self.isUser = False
+        self.isUserCounter = 0
         self.errImg = (None, cv.imread(errImgPath))[errImgPath is not None]
         self.checkSleep = checkSleep == True
         self.blurredImg = None
+        self.face_recognizer = cv.face.LBPHFaceRecognizer_create()
+        self.face_recognizer.read('./Data/JonathanPesce_Model.yml')
+    
     
     def start(self):
         self.terminate = False
@@ -44,10 +48,11 @@ class VirtualWebcam():
         # Check if the webcam can be opened
         if (video_feed.isOpened() == False):
             return "ERROR - Could not connect to webcam!!!"
+        
         with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=15) as cam:
             while True:
                 frame = self.processFrame(video_feed)
-                #cv.imshow('Title', frame) 
+                # cv.imshow('Title', frame) 
                 
                 # Send to virtual cam
                 cam.send(frame)
@@ -87,12 +92,15 @@ class VirtualWebcam():
         # Check if the person detected is sleeping
         sleeping = self.checkSleep and self.checkForSleep(faces_rect, frame_gray)
         
+        # Check if it is the current user
+        currentUser = self.testIfUser(faces_rect, frame_gray)
+        
         # Check if no faces were detected, if so then increase no face detected counter
-        self.noFaceDetected = (0, self.noFaceDetected + 1)[len(faces_rect) < 1 or sleeping]
+        self.noFaceDetected = (0, self.noFaceDetected + 1)[len(faces_rect) < 1 or sleeping or currentUser]
         
         # Check if face is not detected, if so send blocking frame
         if (self.noFaceDetected > ERROR_THRESHOLD):
-            frame = self.getBlockFrame(frame, sleeping)
+            frame = self.getBlockFrame(frame, sleeping, currentUser)
         else:
             self.blurredImg = None
         
@@ -110,7 +118,7 @@ class VirtualWebcam():
         out_frame_rgba[:, :, :3] = out_frame
         out_frame_rgba[:, :, 3] = 255
         cv.flip(out_frame_rgba, -1)
-        #out_frame_rgba = frame    
+        # out_frame_rgba = frame    
         
         
         return out_frame_rgba
@@ -130,6 +138,32 @@ class VirtualWebcam():
         return self.isSleeping
     
     
+    
+    def testIfUser(self, framge_gray, faces_rect):
+        return False
+        
+        currentFrameUser = False
+        
+        for (x,y,w,h) in faces_rect:
+            faces_roi = framge_gray[y:y+h, x:x+w]
+            label, confidence = self.face_recognizer.predict(faces_roi)
+            
+            if (label == 1): 
+                currentFrameUser = True
+                break
+        
+        if (self.isUser and currentFrameUser == False) or (self.isUser == False and currentFrameUser == True):
+            self.isUserCounter += 1
+        else:
+            self.isUserCounter = 0
+            
+            
+        if (self.isUserCounter > USER_THRESHOLD):
+            self.isUser = not self.isUser
+
+        return self.isUser     
+
+        
     
     def detectSleeping(self, faces_rect, frame_gray):
         # Check if there was a face that was detected
@@ -151,7 +185,7 @@ class VirtualWebcam():
         
     
     
-    def getBlockFrame(self, frame, sleeping):
+    def getBlockFrame(self, frame, sleeping, currentUser):
         if (self.errImg is not None):
             return self.errImg
         
@@ -162,6 +196,10 @@ class VirtualWebcam():
             # Display different text if sleeping or not
             text = (BLUR_TEXT, SLEEPING_TEXT)[sleeping]
             
+            # Display different currentUser text
+            text = (text, "NOT JONATHAN")[currentUser]
+            
+            
             # Add text to the image
             self.blurredImg = cv.putText(self.blurredImg, text, (20, IMG_H//2), cv.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv.LINE_AA)
 
@@ -169,6 +207,6 @@ class VirtualWebcam():
     
     
     
-# t = VirtualWebcam(errImgPath='ErrorImage.png')
+# t = VirtualWebcam(errImgPath='ErrorImage.png', checkSleep=True)
 t = VirtualWebcam(checkSleep=True)
 t.start()
