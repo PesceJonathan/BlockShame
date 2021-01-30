@@ -187,6 +187,8 @@ def convert2RGBA(frame):
     cv.flip(out_frame_rgba, -1)
     return out_frame_rgba
 
-t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png')
-#t.startPython()
-t.start()
+
+if(__name__ == str('__main__')):  
+    t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png')
+    #t.startPython()
+    t.start()
