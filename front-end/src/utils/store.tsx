@@ -73,6 +73,24 @@ const StateProvider = (props: { children: any }) => {
             ...action.payload,
           },
         };
+      case ActionType.toggleCustomAwayImage:
+        console.log(state, action);
+        return {
+          ...state,
+          videoSettings: {
+            ...state.videoSettings,
+            useCustomAwayImage: action.payload,
+          },
+        };
+      case ActionType.setAwayBackgroundPath:
+        console.log(state, action);
+        return {
+          ...state,
+          videoSettings: {
+            ...state.videoSettings,
+            customImagePath: action.payload,
+          },
+        };
       default:
         throw new Error();
     }
