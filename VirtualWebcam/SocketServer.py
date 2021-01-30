@@ -2,15 +2,22 @@ import eventlet
 import socketio
 import VirtualWebcam
 import subprocess as sp
+from queue import Queue
 from threading import Thread
+
 sio = socketio.Server()
 app = socketio.WSGIApp(sio, static_files={
     '/': {'content_type': 'text/html', 'filename': 'index.html'}
 })
 
+message_queue = Queue()
+thread = None
+
 @sio.event
 def connect(sid, environ):
-
+    if thread == None:
+        thread = Thread(target=long_running, args = (message_queue))
+        thread.start()
     # # ok
     # pipe = sp.Popen( 'python ./VirtualWebcam.py', shell=True, stdout=sp.PIPE, stderr=sp.PIPE )
     # # res = tuple (stdout, stderr)
@@ -31,6 +38,10 @@ def setting_change(sid, data):
 def disconnect(sid):
     print('disconnect ', sid)
 
-def Webcam_process
+
+def long_running(message_queue):
+    t = VirtualWebcam(checkSleep=True)
+    t.start(message_queue)
+
 if __name__ == '__main__':
     eventlet.wsgi.server(eventlet.listen(('', 5000)), app)    

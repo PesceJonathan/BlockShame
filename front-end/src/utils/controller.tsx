@@ -15,3 +15,12 @@ export function startProgram(){
         console.log(`child process exited with code ${code}`);
     });
 }
+
+export function connect(){
+    let socket = new WebSocket("ws://localhost:5000");
+    if(socket != null){
+        socket.onopen = (ev: Event) => {
+            console.log("Created function")
+        }
+    }
+}

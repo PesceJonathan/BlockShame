@@ -7,6 +7,7 @@ export enum View {
 
 export enum ActionType {
   SwitchView,
+  toggleVideoAwayDetection
 }
 
 interface Action {
@@ -17,12 +18,12 @@ interface Action {
 interface StoreState {
   currentView?: View;
   dispatch?: React.Dispatch<Action>;
-
+  videoAwaydetection: Boolean;
 }
 
 const initialState: StoreState = {
-  currentView: View.Webcam
-  
+  currentView: View.Webcam,
+  videoAwaydetection: true
 };
 
 const store = React.createContext<StoreState>(initialState);
@@ -35,6 +36,9 @@ const StateProvider = (props: { children: any }) => {
       case ActionType.SwitchView:
         const newState = { ...initialState, ...action.payload }; // do something with the action
         return newState;
+      case ActionType.toggleVideoAwayDetection:
+        console.log(initialState, action);
+        return {...initialState, toggleVideoAwayDetection: action.payload}
       default:
         throw new Error();
     }

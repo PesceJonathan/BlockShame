@@ -1,6 +1,7 @@
 import { MenuItem } from "electron";
 import * as React from "react";
 import styled from "styled-components";
+import { ActionType, store } from "_/utils/store";
 import MenuItem_ from "../MenuItem_";
 
 const WebcamViewStyled = styled.div`
@@ -15,7 +16,7 @@ const Title = styled.h1`
 
 const WebcamView = () => {
   const greeting = "Hello Function Component!";
-
+  const context = React.useContext(store);
   return (
     <WebcamViewStyled>
       <Title>
@@ -25,26 +26,14 @@ const WebcamView = () => {
         optionName={"Option name"}
         optionDescription={"This is a description of the feature"}
         toggled={false}
-      />
-      <MenuItem_
-        optionName={"Option name"}
-        optionDescription={"This is a description of the feature"}
-        toggled={false}
-      />
-      <MenuItem_
-        optionName={"Option name"}
-        optionDescription={"This is a description of the feature"}
-        toggled={false}
-      />
-      <MenuItem_
-        optionName={"Option name"}
-        optionDescription={"This is a description of the feature"}
-        toggled={false}
-      />
-      <MenuItem_
-        optionName={"Option name"}
-        optionDescription={"This is a description of the feature"}
-        toggled={false}
+        onToggle={(value: boolean) => {
+          if(context && context.dispatch){
+            context.dispatch({
+              type: ActionType.toggleVideoAwayDetection,
+              payload: value
+            })
+          }
+        }}
       />
     </WebcamViewStyled>
   );

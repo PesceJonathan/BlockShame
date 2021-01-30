@@ -38,6 +38,7 @@ class VirtualWebcam():
         self.blurredImg = None
         self.face_recognizer = cv.face.LBPHFaceRecognizer_create()
         self.face_recognizer.read(str(pathlib.Path(__file__).resolve().parent)  + '/Data/JonathanPesce_Model.yml')
+        self.message_queue = None
     
     def start(self):
         self.terminate = False
@@ -56,10 +57,11 @@ class VirtualWebcam():
             print("Running")
             while True:
                 if counter == 30:
-                    self.checkSleep = (os.environ.get('BOOM_CHECK_SLEEPING') == '1')
-                    self.errImg = (os.environ.get('BOOM_CUSTOM_ERROR_IMG_PATH'))
+                    print(self.message_queue)
                     counter = 0
 
+                counter += 1
+                
                 frame = self.processFrame(video_feed)
                 # cv.imshow('Title', frame) 
                 
