@@ -6,6 +6,7 @@ import WebcamView from "./views/WebcamView";
 
 const MainViewStyled = styled.div`
   height: 612px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

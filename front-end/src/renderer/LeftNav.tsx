@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { store, ActionType, View } from "_utils/store";
 import VideocamIcon from "@material-ui/icons/Videocam";
-import SettingsVoiceIcon from "@material-ui/icons/SettingsVoice";
+import SettingsVoiceIcon from '@material-ui/icons/Mic';
 
 const LeftNavStyled = styled.div`
   background-color: #3c3c3c;
@@ -15,8 +15,12 @@ const LeftNavStyled = styled.div`
 `;
 
 const ViewIconBackground = styled.div`
-  padding: 8px 10px;
-  margin: 8px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  width: 50px;
+  height: 50px;
   border-radius: 10px;
   background-color: ${(props: { primary: boolean }) =>
     props.primary ? "palevioletred" : "white"};
@@ -56,6 +60,7 @@ const LeftNav = (props: any) => {
       ].map((el, index) => (
         <ViewIcon
           key={index}
+          
           icon={el.icon}
           primary={el.primary}
           onClick={() => {
