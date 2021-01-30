@@ -35,13 +35,19 @@ class VirtualWebcam():
         # Check if the webcam can be opened
         if (video_feed.isOpened() == False):
             return "ERROR - Could not connect to webcam!!!"
-        
-        while True:
-            frame = self.processFrame(video_feed)
-            cv.imshow('Title', frame) 
+        with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=15) as cam:
+            while True:
+                frame = self.processFrame(video_feed)
+                # cv.imshow('Title', frame) 
                 
-            if cv.waitKey(1) == 27:
-                break
+                # Send to virtual cam
+                cam.send(frame)
+                    
+                # Wait until it's time for the next frame
+                cam.sleep_until_next_frame()
+                    
+                if cv.waitKey(1) == 27:
+                    break
         
         
         
@@ -78,13 +84,13 @@ class VirtualWebcam():
         else:
             self.blurredImg = None
         
-        # # convert to RGBA
-        # out_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-        # out_frame_rgba = np.zeros((IMG_H, IMG_W, 4), np.uint8)
-        # out_frame_rgba[:, :, :3] = out_frame
-        # out_frame_rgba[:, :, 3] = 255
+        # convert to RGBA
+        out_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+        out_frame_rgba = np.zeros((IMG_H, IMG_W, 4), np.uint8)
+        out_frame_rgba[:, :, :3] = out_frame
+        out_frame_rgba[:, :, 3] = 255
             
-        return frame
+        return out_frame_rgba
         
         
         
