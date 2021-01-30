@@ -19,19 +19,17 @@ const WebcamView = () => {
   const context = React.useContext(store);
   return (
     <WebcamViewStyled>
-      <Title>
-          Webcam
-      </Title>
+      <Title>Webcam</Title>
       <MenuItem_
         optionName={"Option name"}
         optionDescription={"This is a description of the feature"}
         toggled={false}
         onToggle={(value: boolean) => {
-          if(context && context.dispatch){
+          if (context && context.dispatch) {
             context.dispatch({
               type: ActionType.toggleVideoAwayDetection,
-              payload: value
-            })
+              payload: value,
+            });
           }
         }}
       />
