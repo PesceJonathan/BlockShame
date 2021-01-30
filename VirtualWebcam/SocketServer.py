@@ -22,23 +22,18 @@ def connect(sid, environ):
         if thread == None:
             thread = Thread(target=long_running, args = (message_queue,))
             thread.start()
-        # # ok
-        # pipe = sp.Popen( 'python ./VirtualWebcam.py', shell=True, stdout=sp.PIPE, stderr=sp.PIPE )
-        # # res = tuple (stdout, stderr)
-        # res = pipe.communicate()
-        # print("retcode =", pipe.returncode)
-        # print("res =", res)
-        # print("stderr =", res[1])
-        # for line in res[0].decode(encoding='utf-8').split('\n'):
-        # print(line)
-
         print('connect ', sid)
     except:
         traceback.print_exc()
 
 @sio.event
-def setting_change(sid, data):    
-    print('Setting changed', data)
+def setting_change(sid, data):        
+    if data.get("webcam"):
+        print('Setting changed', data.get("webcam"))
+    elif data.get("accessibility"):
+        print('Setting changed', data.get("accessibility"))
+    else:
+        pass
     # Add the data to Queue
     return "OK", 123
 

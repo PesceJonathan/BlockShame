@@ -2,7 +2,8 @@ import * as React from "react";
 import styled from "styled-components";
 import { store, ActionType, View } from "_utils/store";
 import VideocamIcon from "@material-ui/icons/Videocam";
-import SettingsVoiceIcon from '@material-ui/icons/Mic';
+import SettingsVoiceIcon from "@material-ui/icons/Mic";
+import HearingIcon from "@material-ui/icons/Hearing";
 
 const LeftNavStyled = styled.div`
   background-color: #3c3c3c;
@@ -57,10 +58,14 @@ const LeftNav = (props: any) => {
           view: View.Audio,
           primary: currentView === View.Audio,
         },
+        {
+          icon: <HearingIcon fontSize="large" />,
+          view: View.Accessiblity,
+          primary: currentView === View.Accessiblity,
+        },
       ].map((el, index) => (
         <ViewIcon
           key={index}
-          
           icon={el.icon}
           primary={el.primary}
           onClick={() => {
@@ -68,7 +73,7 @@ const LeftNav = (props: any) => {
               dispatch({
                 type: ActionType.SwitchView,
                 payload: {
-                  currentView: el.view,
+                  currentView: el.view.valueOf(),
                 },
               });
             }

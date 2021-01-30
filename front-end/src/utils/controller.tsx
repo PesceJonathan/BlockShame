@@ -33,8 +33,8 @@ export function connect(): Promise<void>{
     })
 }
 
-export function sendMessage(obj: any) {
+export function sendMessage(obj: any, event="setting_change") {
     if(socket){
-        socket.emit("setting_change", obj);
+        socket.emit(event, obj);
     }
 }
