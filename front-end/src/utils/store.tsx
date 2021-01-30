@@ -7,7 +7,9 @@ export enum View {
 
 export enum ActionType {
   SwitchView,
-  toggleVideoAwayDetection
+  toggleVideoAwayDetection,
+  setAwayBackgroundPath,
+  toggleCustomAwayImage
 }
 
 interface Action {
@@ -19,14 +21,18 @@ interface StoreState {
   currentView?: View;
   dispatch?: React.Dispatch<Action>;
   videoSettings: {
-    videoAwaydetection: Boolean;
+    videoAwaydetection: Boolean,
+    useCustomAwayImage: Boolean,
+    customImagePath: string,
   }
 }
 
 const initialState: StoreState = {
   currentView: View.Webcam,
   videoSettings: {
-    videoAwaydetection: true
+    videoAwaydetection: true,
+    useCustomAwayImage: false,
+    customImagePath: ''
   }
 };
 

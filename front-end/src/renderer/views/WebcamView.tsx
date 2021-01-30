@@ -23,14 +23,36 @@ const WebcamView = () => {
           Webcam
       </Title>
       <MenuItem_
-        optionName={"Option name"}
-        optionDescription={"This is a description of the feature"}
+        optionName={"Detect User is away"}
+        optionDescription={"Turns the camera off when the user is no longer on the camera"}
         toggled={false}
         onToggle={(value: boolean) => {
           if(context && context.dispatch){
             context.dispatch({
               type: ActionType.toggleVideoAwayDetection,
               payload: value
+            })
+          }
+        }}
+      />
+      <MenuItem_
+        optionName={"Show custom image"}
+        optionDescription={"Show a custom image when the user is away"}
+        toggled={false}
+        filePicker={true}
+        onToggle={(value: boolean) => {
+          if(context && context.dispatch){
+            context.dispatch({
+              type: ActionType.toggleCustomAwayImage,
+              payload: value
+            })
+          }
+        }}
+        onFileChoose={(path: string) => {
+          if(context && context.dispatch){
+            context.dispatch({
+              type: ActionType.setAwayBackgroundPath,
+              payload: path
             })
           }
         }}
