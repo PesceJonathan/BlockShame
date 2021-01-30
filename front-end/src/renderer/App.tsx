@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 import LeftNav from "./LeftNav";
 import MainView from "./MainView";
+import { startProgram } from "_utils/controller";
 
 const AppStyled = styled.div`
   display: flex;
@@ -16,6 +17,8 @@ const App = (props: any) => {
   //   }
   // }
   React.useEffect(() => {}, []);
+  
+  
   return (
     <ThemeProvider theme={theme}>
       <AppStyled>

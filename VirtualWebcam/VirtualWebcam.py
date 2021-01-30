@@ -8,7 +8,8 @@ Created on Fri Jan 29 21:18:23 2021
 import cv2 as cv
 import pyvirtualcam
 import numpy as np
-
+import pathlib
+import os
 # Constants
 IMG_W = 640
 IMG_H = 480
@@ -21,10 +22,11 @@ SLEEPING_TEXT = 'BLURED BECAUSE SLEEPING'
 class VirtualWebcam():
     
     def __init__(self, errImgPath=None, checkSleep=False):
-        self.face_cascade = cv.CascadeClassifier('./Haarcascades/haarcascade_frontalface_default.xml')
-        self.open_eyes_cascade = cv.CascadeClassifier('./Haarcascades/haarcascade_eye.xml')
-        self.right_eyes_cascade = cv.CascadeClassifier('./Haarcascades/haarcascade_righteye_2splits.xml')
-        self.left_eyes_cascade = cv.CascadeClassifier('./Haarcascades/haarcascade_lefteye_2splits.xml')
+        self.face_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_frontalface_default.xml')
+        self.open_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_eye.xml')
+        self.right_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_righteye_2splits.xml')
+        self.left_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_lefteye_2splits.xml')
+        # breakpoint()
         self.terminate = True
         self.noFaceDetected = 0
         self.isSleeping = False
@@ -35,8 +37,7 @@ class VirtualWebcam():
         self.checkSleep = checkSleep == True
         self.blurredImg = None
         self.face_recognizer = cv.face.LBPHFaceRecognizer_create()
-        self.face_recognizer.read('./Data/JonathanPesce_Model.yml')
-    
+        self.face_recognizer.read(str(pathlib.Path(__file__).resolve().parent)  + '/Data/JonathanPesce_Model.yml')
     
     def start(self):
         self.terminate = False
@@ -48,9 +49,17 @@ class VirtualWebcam():
         # Check if the webcam can be opened
         if (video_feed.isOpened() == False):
             return "ERROR - Could not connect to webcam!!!"
-        
-        with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=15) as cam:
+
+        counter = 0
+
+        with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=30) as cam:
+            print("Running")
             while True:
+                if counter == 30:
+                    self.checkSleep = (os.environ.get('BOOM_CHECK_SLEEPING') == '1')
+                    self.errImg = (os.environ.get('BOOM_CUSTOM_ERROR_IMG_PATH'))
+                    counter = 0
+
                 frame = self.processFrame(video_feed)
                 # cv.imshow('Title', frame) 
                 
@@ -106,9 +115,9 @@ class VirtualWebcam():
         
         
         
-        # # Draw the rectangles for debugging purposes
-        # for (x,y,w,h) in faces_rect:
-        #     cv.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), thickness=1)
+        # Draw the rectangles for debugging purposes
+        for (x,y,w,h) in faces_rect:
+            cv.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), thickness=1)
         
             
         
@@ -126,7 +135,7 @@ class VirtualWebcam():
     
     def checkForSleep(self, faces_rect, frame_gray):
         sleeping = self.detectSleeping(faces_rect, frame_gray)
-        
+    
         if (self.isSleeping and sleeping == False) or (self.isSleeping == False and sleeping): 
             self.sleepCounter += 1
         else:
@@ -206,7 +215,7 @@ class VirtualWebcam():
         return self.blurredImg
     
     
-    
-# t = VirtualWebcam(errImgPath='ErrorImage.png', checkSleep=True)
-t = VirtualWebcam(checkSleep=True)
-t.start()
+if(__name__ == str('__main__')):    
+    # t = VirtualWebcam(errImgPath='ErrorImage.png', checkSleep=True)
+    t = VirtualWebcam(checkSleep=True)
+    t.start()
