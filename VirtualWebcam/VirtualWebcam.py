@@ -40,10 +40,10 @@ class VirtualWebcam():
         self.face_recognizer.read(str(pathlib.Path(__file__).resolve().parent)  + '/Data/JonathanPesce_Model.yml')
         self.message_queue = None
     
-    def start(self):
+    def start(self, message_queue):
         self.terminate = False
         self.noFaceDetected = 0
-        
+        self.message_queue = message_queue
         # Use OpenCV to grab the webcam video feed
         video_feed = cv.VideoCapture(0)
         
@@ -61,7 +61,7 @@ class VirtualWebcam():
                     counter = 0
 
                 counter += 1
-                
+
                 frame = self.processFrame(video_feed)
                 # cv.imshow('Title', frame) 
                 

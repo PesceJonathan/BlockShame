@@ -18,12 +18,16 @@ interface Action {
 interface StoreState {
   currentView?: View;
   dispatch?: React.Dispatch<Action>;
-  videoAwaydetection: Boolean;
+  videoSettings: {
+    videoAwaydetection: Boolean;
+  }
 }
 
 const initialState: StoreState = {
   currentView: View.Webcam,
-  videoAwaydetection: true
+  videoSettings: {
+    videoAwaydetection: true
+  }
 };
 
 const store = React.createContext<StoreState>(initialState);
@@ -38,7 +42,7 @@ const StateProvider = (props: { children: any }) => {
         return newState;
       case ActionType.toggleVideoAwayDetection:
         console.log(initialState, action);
-        return {...initialState, toggleVideoAwayDetection: action.payload}
+        return {...initialState, videoSettings: {...initialState.videoSettings, videoAwaydetection: action.payload}}
       default:
         throw new Error();
     }
