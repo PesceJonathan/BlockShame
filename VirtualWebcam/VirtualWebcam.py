@@ -90,7 +90,7 @@ class VirtualWebcam():
     
     
     def updateShouldShowCame(self, frame, checkFace):
-        if (self.notPresent == False and self.isSleeping == False and checkFace == False):
+        if (self.notPresent == False and self.isSleeping == False and checkFace == False and self.NotUser == False):
             return True
         
         # Convert the frame to grayscale
@@ -114,12 +114,14 @@ class VirtualWebcam():
                 else:
                     print("Is User")
                     self.NotUser = True
-                    
-                    
+        else:
+            if (self.NotUser == False):
+                return False
         
         # If user is not present turn off the webcam
         if (self.notPresent and len(face_rects) < 1):
             shouldTurnOff = True
+            
             
         if (shouldTurnOff == False and self.isSleeping and self.detectSleeping(face_rects, frame_gray)):
             shouldTurnOff = True
