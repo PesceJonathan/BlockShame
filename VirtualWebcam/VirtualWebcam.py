@@ -202,7 +202,8 @@ class VirtualWebcam():
         
         cv.waitKey(0)
         video_feed.release()
-  
+        writeTimeFrame(None, datetime.now())
+        
 
 def toggleMic(val):
     win32api.SendMessage(-1, WM_APPCOMMAND, 0x30292, val * 0x10000)
@@ -223,7 +224,7 @@ def appendToCSV(startTime, endTime):
 def createCSV():
     with open("ConcentrationData.csv","w+", newline='') as file:
         csvWriter = csv.writer(file, delimiter=',')
-        csvWriter.writerows(["StartTime", "EndTime"], [datetime.now(), None])
+        csvWriter.writerows([["StartTime", "EndTime"], [datetime.now(), None]])
         
 
 def writeTimeFrame(startTime, endTime):
