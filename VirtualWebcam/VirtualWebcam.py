@@ -38,7 +38,9 @@ class VirtualWebcam():
             self.face_recognizer.read(str(pathlib.Path(__file__).resolve().parent)  + '/Data/JonathanPesce_Model.yml')
         else:
             self.face_recognizer = None
-            
+        
+        # Create the csv that will contain the concentration data
+        createCSV()
             
             
     def start(self):
@@ -65,8 +67,6 @@ class VirtualWebcam():
         cv.waitKey(0)
         video_feed.release()
 
-       
-
         
     def processFrame(self, video_feed, counter, isPython=False):
         # Read the frame from the webcam
@@ -75,8 +75,15 @@ class VirtualWebcam():
         if (counter % 5 == 0):
             if (self.updateShouldShowCame(frame, counter == 30 and self.face_recognizer is not None) == False):
                 frame = self.getBlockFrame(frame, self.notPresent)
+                
+                if (self.startLookAwayTime is None):
+                    self.startLookAwayTime = datetime.now()
+                
             elif (self.blockFrame is not None):
                 self.blockFrame = None
+                
+                if (self.startLookAwayTime is not None):
+                    writeTimeFrame(self.startLookAwayTime, datetime.now())
                 
                 if (self.controlMic):
                     turnOnMic()
@@ -127,6 +134,7 @@ class VirtualWebcam():
             shouldTurnOff = True
              
         self.notPresentCounter = (0, self.notPresentCounter + 1)[shouldTurnOff]
+        
         return self.notPresentCounter < ERROR_THRESHOLD
     
     
@@ -208,13 +216,19 @@ def turnOnMic():
     thread.start()
 
 def appendToCSV(startTime, endTime):
-    with open("BubbleDataCTRM.csv","a+", newline='') as file:
+    with open("ConcentrationData.csv","a+", newline='') as file:
         csvWriter = csv.writer(file, delimiter=',')
         csvWriter.writerow([startTime, endTime])
 
+def createCSV():
+    with open("ConcentrationData.csv","w+", newline='') as file:
+        csvWriter = csv.writer(file, delimiter=',')
+        csvWriter.writerows(["StartTime", "EndTime"], [datetime.now(), None])
+        
 
 def writeTimeFrame(startTime, endTime):
     thread = Thread(target=appendToCSV, args=([startTime, endTime]))
+    thread.start()
 
 def convert2RGBA(frame):
     # convert to RGBA
@@ -228,5 +242,5 @@ def convert2RGBA(frame):
 
 
 t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=False)
-#t.startPython()
-t.start()
+t.startPython()
+#t.start()
