@@ -70,12 +70,12 @@ def getConcentrateData():
     finalData = []
     
     for time in concentrateData:
-        finalData.append(100 - (time/intervalTimes) * 100)
+        finalData.append(str(100 - (time/intervalTimes) * 100))
         
+    
     return finalData
 
 
 data = getConcentrateData()
-with open("./Data/ConcentrateArray.csv","w+", newline='') as file:
-    csvWriter = csv.writer(file, delimiter=',')
-    csvWriter.writerow(data)
+with open("./Data/ConcentrateArray.txt","w+", newline='') as file:
+    file.write(','.join(data))
