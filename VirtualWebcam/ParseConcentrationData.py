@@ -6,7 +6,6 @@ Created on Sat Jan 30 21:36:46 2021
 """
 import pandas as pd
 import datetime
-import csv
 
 def getConcentrateData():
     # def parseData(): 
