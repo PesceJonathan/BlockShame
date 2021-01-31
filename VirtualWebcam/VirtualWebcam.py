@@ -155,53 +155,40 @@ class VirtualWebcam(Thread):
     def start(self, message_queue):
         self.message_queue = message_queue
         # Use OpenCV to grab the webcam video feed
-        # video_feed = cv.VideoCapture(0)
+        video_feed = cv.VideoCapture(0)
+        
+        
+        
         if self.transcribe:
             self.speech_thread = Thread(target=main, args=(self.transcript_queue,))
             self.speech_thread.start()
+            
+            
+            
         # Check if the webcam can be opened
-        # if (video_feed.isOpened() == False):
-        #     return "ERROR - Could not connect to webcam!!!"
-
-        # with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=30) as cam:
-        #     counter = 0
-        #     while True:
-
-        #         frame = self.processFrame(video_feed, counter)
-
-        #         counter = (counter + 1, 0)[counter == 30]
-
-        #         # Send to virtual cam
-        #         cam.send(frame)
-
-        #         # Wait until it's time for the next frame
-        #         cam.sleep_until_next_frame()
-
-        # cv.waitKey(0)
-        # video_feed.release()
-
-        # delete
-        video_feed = cv.VideoCapture(0)
-
-        # Check if the webcam can be opened
-        if video_feed.isOpened() == False:
+        if (video_feed.isOpened() == False):
             return "ERROR - Could not connect to webcam!!!"
 
-        counter = 0
-        while True:
-            # self.sync_config()
-            frame = self.processFrame(video_feed, counter, isPython=True)
+        with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=30) as cam:
+            counter = 0
+            while True:
 
-            counter = (counter + 1, 0)[counter == 30]
-            if counter == 29:
-                self.sync_config()
+                frame = self.processFrame(video_feed, counter)
 
-            cv.imshow("Title", frame)
-            cv.waitKey(1)
+                counter = (counter + 1, 0)[counter == 30]
+                
+                if counter == 29:
+                    self.sync_config()
+
+                # Send to virtual cam
+                cam.send(frame)
+
+                # Wait until it's time for the next frame
+                cam.sleep_until_next_frame()
 
         cv.waitKey(0)
         video_feed.release()
-        writeTimeFrame(None, datetime.now())
+        
 
     def processFrame(self, video_feed, counter, isPython=False):
         # Read the frame from the webcam
@@ -397,6 +384,7 @@ def turnOnMic():
 
 
 def appendToCSV(startTime, endTime):
+    print("Append to csv")
     with open(
         str(pathlib.Path(__file__).resolve().parent) + "./Data/ConcentrationData.csv",
         "a+",
@@ -438,5 +426,5 @@ if __name__ == "__main__":
         controlMic=False,
         faceRecognition=False,
     )
-    t.startPython()
-    # t.start()
+    #t.startPython()
+    t.start()

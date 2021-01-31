@@ -6,12 +6,12 @@ Created on Sat Jan 30 21:36:46 2021
 """
 import pandas as pd
 import datetime
+import pathlib
+str(pathlib.Path(__file__).resolve().parent)
+
 
 def getConcentrateData():
-    # def parseData(): 
-    data = pd.read_csv('./Data/ConcentrationDataV2.csv')
-    df = pd.DataFrame([[None, '2021-01-30 23:03:42.669845']], columns=['StartTime', 'EndTime'])
-    data = data.append(df, ignore_index=True)
+    data = pd.read_csv(str(pathlib.Path(__file__).resolve().parent) + './Data/ConcentrationDataV2.csv')
     
     def parseDate(value):  
         if (pd.isna(value) == False):
@@ -76,5 +76,5 @@ def getConcentrateData():
 
 
 data = getConcentrateData()
-with open("./Data/ConcentrateArray.txt","w+", newline='') as file:
+with open(str(pathlib.Path(__file__).resolve().parent) + "./Data/ConcentrateArray.txt","w+", newline='') as file:
     file.write(','.join(data))
