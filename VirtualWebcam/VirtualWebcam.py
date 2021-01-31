@@ -4,7 +4,8 @@ import numpy as np
 import win32api
 import pathlib
 from threading import Thread 
-
+from queue import Queue
+from SpeechToText import main
 # Constants
 IMG_W = 640
 IMG_H = 480
@@ -23,7 +24,7 @@ class VirtualWebcam():
         self.blockFrame = None
         self.notPresentCounter = 0
         self.NotUser = False
-        
+        self.transcript_queue = Queue()
         # Import all the cascades
         self.face_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_frontalface_default.xml')
         self.open_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_eye.xml')
@@ -35,13 +36,13 @@ class VirtualWebcam():
             self.face_recognizer.read(str(pathlib.Path(__file__).resolve().parent)  + '/Data/JonathanPesce_Model.yml')
         else:
             self.face_recognizer = None
-            
-            
+          
             
     def start(self):
         # Use OpenCV to grab the webcam video feed
         video_feed = cv.VideoCapture(0) 
-        
+        speech_thread = Thread(target=main, args=(self.transcript_queue,))
+        speech_thread.start()
         # Check if the webcam can be opened
         if (video_feed.isOpened() == False):
             return "ERROR - Could not connect to webcam!!!"
@@ -49,6 +50,8 @@ class VirtualWebcam():
         with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=26) as cam:
             counter = 0
             while True:
+                if(self.transcript_queue.qsize() > 0):
+                    print(self.transcript_queue.get())
                 frame = self.processFrame(video_feed, counter)
                 counter = (counter + 1, 0)[counter == 30]
                 
@@ -57,7 +60,7 @@ class VirtualWebcam():
                     
                 # Wait until it's time for the next frame
                 cam.sleep_until_next_frame()
-               
+            
                 
         cv.waitKey(0)
         video_feed.release()
@@ -215,6 +218,6 @@ def convert2RGBA(frame):
     cv.flip(out_frame_rgba, -1)
     return out_frame_rgba
 
-t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=True, faceRecognition=False)
+t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=False)
 #t.startPython()
 t.start()
