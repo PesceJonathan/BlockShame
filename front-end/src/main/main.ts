@@ -22,6 +22,7 @@ function createWindow(): void {
     },
     transparent: true,
     frame: false,
+    icon: 'public/Logo.ico',
   });
   mainWindow.setMenu(null);
   mainWindow.setResizable(false);
