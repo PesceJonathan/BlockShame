@@ -38,23 +38,25 @@ interface StoreState {
   }
   accessibilitySettings: {
     aslTranslation: Boolean;
+    audioTranscriber: Boolean;
   };
 }
 
 const initialState: StoreState = {
   currentView: View.Webcam,
   videoSettings: {
-    videoAwaydetection: true,
     useCustomAwayImage: false,
+    customImagePath: 'E:\Hackathon\BlockShame\VirtualWebcam\ErrorImage.png',
+    videoAwaydetection: true,
     videoSleepingDetection: false,
     videoNotUserDetection: false,
-    customImagePath: ''
   },
   audioSettings: {
     muteAudioWhenVideoIsDisabled: false
   },
   accessibilitySettings: {
     aslTranslation: false,
+    audioTranscriber: false
   },
 };
 
