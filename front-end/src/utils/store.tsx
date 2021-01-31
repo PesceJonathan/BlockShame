@@ -44,11 +44,11 @@ interface StoreState {
 const initialState: StoreState = {
   currentView: View.Webcam,
   videoSettings: {
-    videoAwaydetection: true,
     useCustomAwayImage: false,
+    customImagePath: '',
+    videoAwaydetection: true,
     videoSleepingDetection: false,
     videoNotUserDetection: false,
-    customImagePath: ''
   },
   audioSettings: {
     muteAudioWhenVideoIsDisabled: false

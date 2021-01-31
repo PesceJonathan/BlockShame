@@ -16,22 +16,28 @@ thread = None
 
 @sio.event
 def connect(sid, environ):
+    print('-------------------CONNECT ', sid)
     try:
         global thread
         global message_queue
         if thread == None:
             thread = Thread(target=long_running, args = (message_queue,))
             thread.start()
-        print('connect ', sid)
     except:
         traceback.print_exc()
 
 @sio.event
-def setting_change(sid, data):        
+def setting_change(sid, data):      
+    print(data)  
     if data.get("webcam"):
         print('Setting changed', data.get("webcam"))
+        message_queue.put({"webcam", data.get("webcam")})
     elif data.get("accessibility"):
         print('Setting changed', data.get("accessibility"))
+        message_queue.put({"accessibility", data.get("accessibility")})
+    elif data.get("audio"):
+        print('Setting changed', data.get("audio"))
+        message_queue.put({"audio", data.get("audio")})
     else:
         pass
     # Add the data to Queue
@@ -43,7 +49,7 @@ def disconnect(sid):
 
 print("ASDASDSD")
 def long_running(message_queue):
-    t = VirtualWebcam(checkSleep=True)
+    t = VirtualWebcam()
     print("Starting up webcam")
     t.start(message_queue)
 
