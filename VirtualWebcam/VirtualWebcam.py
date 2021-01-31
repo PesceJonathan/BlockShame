@@ -93,11 +93,13 @@ class VirtualWebcam():
                 
                 if (self.startLookAwayTime is not None):
                     writeTimeFrame(self.startLookAwayTime, datetime.now())
+                    self.startLookAwayTime = None
                 
                 if (self.controlMic):
                     turnOnMic()
         elif (self.blockFrame is not None):
             frame = self.blockFrame
+            cv.flip(frame, -1)
         
         # If we are pushing to OBS convert to RGBA
         if (isPython == False):
@@ -239,12 +241,12 @@ def turnOnMic():
     thread.start()
 
 def appendToCSV(startTime, endTime):
-    with open("ConcentrationData.csv","a+", newline='') as file:
+    with open("./Data/ConcentrationData.csv","a+", newline='') as file:
         csvWriter = csv.writer(file, delimiter=',')
         csvWriter.writerow([startTime, endTime])
 
 def createCSV():
-    with open("ConcentrationData.csv","w+", newline='') as file:
+    with open("./Data/ConcentrationData.csv","w+", newline='') as file:
         csvWriter = csv.writer(file, delimiter=',')
         csvWriter.writerows([["StartTime", "EndTime"], [datetime.now(), None]])
         
@@ -259,9 +261,10 @@ def convert2RGBA(frame):
     out_frame_rgba = np.zeros((IMG_H, IMG_W, 4), np.uint8)
     out_frame_rgba[:, :, :3] = out_frame
     out_frame_rgba[:, :, 3] = 255
-    cv.flip(out_frame_rgba, -1)
     return out_frame_rgba
 
-t = VirtualWebcam(notPresent=True, isSleeping=False, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=False)
-# t.startPython()
+
+
+t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=False)
+#t.startPython()
 t.start()
