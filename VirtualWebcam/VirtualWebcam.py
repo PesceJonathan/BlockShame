@@ -244,5 +244,5 @@ def convert2RGBA(frame):
 
 
 t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=False)
-#t.startPython()
-t.start()
+t.startPython()
+#t.start()
