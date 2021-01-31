@@ -13,7 +13,8 @@ export enum ActionType {
   toggleCustomAwayImage,
   toggleAccesibilityConfig,
   toggleVideoSleepingDetection,
-  toggleNotUserDetection
+  toggleNotUserDetection,
+  toggleMuteAudioWhenVideoDisabled,
 }
 
 interface Action {
@@ -31,6 +32,9 @@ interface StoreState {
     videoSleepingDetection: Boolean,
     videoNotUserDetection: Boolean,
   };
+  audioSettings:{
+    muteAudioWhenVideoIsDisabled: Boolean,
+  }
   accessibilitySettings: {
     aslTranslation: Boolean;
   };
@@ -44,6 +48,9 @@ const initialState: StoreState = {
     videoSleepingDetection: false,
     videoNotUserDetection: false,
     customImagePath: ''
+  },
+  audioSettings: {
+    muteAudioWhenVideoIsDisabled: false
   },
   accessibilitySettings: {
     aslTranslation: false,
@@ -115,6 +122,16 @@ const StateProvider = (props: { children: any }) => {
           videoSettings: {
             ...state.videoSettings,
             videoNotUserDetection: action.payload,
+          },
+        };
+
+        case ActionType.toggleMuteAudioWhenVideoDisabled:
+        console.log(state, action);
+        return {
+          ...state,
+          audioSettings: {
+            ...state.videoSettings,
+            muteAudioWhenVideoIsDisabled: action.payload,
           },
         };
       default:
