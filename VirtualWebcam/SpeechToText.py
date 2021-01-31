@@ -119,9 +119,9 @@ def listen_print_loop(responses, transcript_queue):
         overwrite_chars = " " * (num_chars_printed - len(transcript))
 
         if not result.is_final:
-            sys.stdout.write(transcript + overwrite_chars + "\r")
-            sys.stdout.flush()
-
+            # sys.stdout.write(transcript + overwrite_chars + "\r")
+            # sys.stdout.flush()
+            transcript_queue.put(transcript + overwrite_chars)
             num_chars_printed = len(transcript)
 
         else:
@@ -140,7 +140,7 @@ def main(transcript_queue=None):
     # See http://g.co/cloud/speech/docs/languages
     # for a list of supported languages.
     language_code = "en-US"  # a BCP-47 language tag
-    # print("HI")
+    print("Mic service powered by google cloud started")
     client = speech.SpeechClient()
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,

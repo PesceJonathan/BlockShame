@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap");
-
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300&display=swap');
 html {
   margin: 0px;
   padding: 0px;
@@ -9,13 +9,14 @@ html {
 body {
   padding: 0px;
   margin: 0px;
-  background-color: #f1efdd;
+  background-color: rgba(0,0,0,0);
   position: absolute;
   top: 0px;
   left: 0px;
   right: 0px;
   bottom: 0px;
   overflow: hidden;
+  border-radius: 15px;
 }
 
 #title-bar {
@@ -25,10 +26,12 @@ body {
   margin: 0px;
   display: flex;
   flex-direction: row;
-  background-color: #192861;
+  background-color: #1f1f1f;
   align-items: center;
   color: #d9aa33;
   flex: 0 1 auto;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 #B {

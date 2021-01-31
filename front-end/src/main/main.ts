@@ -20,6 +20,7 @@ function createWindow(): void {
       preload: path.join(__dirname, "./preload.js"),
       enableRemoteModule: true,
     },
+    transparent: true,
     frame: false,
   });
   mainWindow.setMenu(null);

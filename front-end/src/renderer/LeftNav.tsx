@@ -13,6 +13,7 @@ const LeftNavStyled = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-bottom-left-radius: 5px;
 `;
 
 const ViewIconBackground = styled.div`
@@ -24,7 +25,7 @@ const ViewIconBackground = styled.div`
   height: 50px;
   border-radius: 10px;
   background-color: ${(props: { primary: boolean }) =>
-    props.primary ? "palevioletred" : "white"};
+    props.primary ? "#d9aa33" : "white"};
 `;
 
 interface ViewIconProps {

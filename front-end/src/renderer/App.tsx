@@ -8,6 +8,7 @@ import { startProgram } from "_utils/controller";
 const AppStyled = styled.div`
   display: flex;
   flex-direction: row;
+  height: 100%;
 `;
 const App = (props: any) => {
   let theme = createMuiTheme();

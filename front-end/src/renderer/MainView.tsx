@@ -7,11 +7,12 @@ import WebcamView from "./views/WebcamView";
 import AccessiblityView from "./views/AccessiblityView";
 
 const MainViewStyled = styled.div`
-  height: 612px;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: #f1f0e7;
+  border-bottom-right-radius: 5px;
 `;
 const viewMap = {
   [View.Webcam]: <WebcamView />,
