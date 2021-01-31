@@ -25,6 +25,7 @@ const ViewIconBackground = styled.div`
   width: 50px;
   height: 50px;
   border-radius: 10px;
+  cursor: pointer;
   background-color: ${(props: { primary: boolean }) =>
     props.primary ? "#d9aa33" : "white"};
 `;
