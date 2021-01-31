@@ -4,6 +4,7 @@ import { store, ActionType, View } from "_utils/store";
 import VideocamIcon from "@material-ui/icons/Videocam";
 import SettingsVoiceIcon from "@material-ui/icons/Mic";
 import HearingIcon from "@material-ui/icons/Hearing";
+import TimelineIcon from '@material-ui/icons/Timeline';
 
 const LeftNavStyled = styled.div`
   background-color: #3c3c3c;
@@ -63,6 +64,11 @@ const LeftNav = (props: any) => {
           icon: <HearingIcon fontSize="large" />,
           view: View.Accessiblity,
           primary: currentView === View.Accessiblity,
+        },
+        {
+          icon: <TimelineIcon fontSize="large" />,
+          view: View.Concentration,
+          primary: currentView === View.Concentration,
         },
       ].map((el, index) => (
         <ViewIcon

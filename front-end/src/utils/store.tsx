@@ -4,6 +4,7 @@ export enum View {
   Webcam = "Webcam",
   Audio = "Audio",
   Accessiblity = "Accessiblity",
+  Concentration = "Concentration",
 }
 
 export enum ActionType {

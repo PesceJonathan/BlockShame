@@ -5,6 +5,8 @@ import { store, ActionType, View } from "_utils/store";
 import AudioView from "./views/AudioView";
 import WebcamView from "./views/WebcamView";
 import AccessiblityView from "./views/AccessiblityView";
+import Concentration from "./views/ConcentrationView";
+import ConcentrationView from "./views/ConcentrationView";
 
 const MainViewStyled = styled.div`
   width: 100%;
@@ -18,6 +20,7 @@ const viewMap = {
   [View.Webcam]: <WebcamView />,
   [View.Audio]: <AudioView />,
   [View.Accessiblity]: <AccessiblityView />,
+  [View.Concentration]: <ConcentrationView />
 };
 
 const MainView = (props: any) => {
