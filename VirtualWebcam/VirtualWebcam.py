@@ -6,7 +6,11 @@ import pyvirtualcam
 import numpy as np
 import win32api
 import pathlib
-
+import math
+from threading import Thread 
+from queue import Queue
+from SpeechToText import main
+import textwrap 
 # Constants
 IMG_W = 640
 IMG_H = 480
@@ -25,8 +29,10 @@ class VirtualWebcam():
         self.blockFrame = None
         self.notPresentCounter = 0
         self.NotUser = False
+        self.transcript_queue = Queue()
         self.startLookAwayTime = None
-        
+        self.transcript_curr_message = ""
+        self.transcriptTimeout = None
         # Import all the cascades
         self.face_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_frontalface_default.xml')
         self.open_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_eye.xml')
@@ -46,15 +52,18 @@ class VirtualWebcam():
     def start(self):
         # Use OpenCV to grab the webcam video feed
         video_feed = cv.VideoCapture(0) 
-        
+        speech_thread = Thread(target=main, args=(self.transcript_queue,))
+        speech_thread.start()
         # Check if the webcam can be opened
         if (video_feed.isOpened() == False):
             return "ERROR - Could not connect to webcam!!!"
         
-        with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=26) as cam:
+        with pyvirtualcam.Camera(width=IMG_W, height=IMG_H, fps=30) as cam:
             counter = 0
             while True:
+                
                 frame = self.processFrame(video_feed, counter)
+                
                 counter = (counter + 1, 0)[counter == 30]
                 
                 # Send to virtual cam
@@ -62,7 +71,7 @@ class VirtualWebcam():
                     
                 # Wait until it's time for the next frame
                 cam.sleep_until_next_frame()
-               
+            
                 
         cv.waitKey(0)
         video_feed.release()
@@ -75,7 +84,7 @@ class VirtualWebcam():
         if (counter % 5 == 0):
             if (self.updateShouldShowCame(frame, counter == 30 and self.face_recognizer is not None) == False):
                 frame = self.getBlockFrame(frame, self.notPresent)
-                
+
                 if (self.startLookAwayTime is None):
                     self.startLookAwayTime = datetime.now()
                 
@@ -96,7 +105,20 @@ class VirtualWebcam():
         if (isPython == False):
             frame = convert2RGBA(frame)
         
+        if(self.transcript_queue.qsize() > 0):
+            self.transcript_curr_message = self.transcript_queue.get()
+            print("T: " + self.transcript_curr_message)
+            self.transcript_curr_message = textwrap.wrap(self.transcript_curr_message, width=30)
+            self.transcriptTimeout = 0
         
+        if(self.transcriptTimeout is not None):
+            if self.transcriptTimeout < 2 * 15 * len(self.transcript_curr_message):
+                for i, v in enumerate(self.transcript_curr_message):
+                    print(v)
+                    frame = cv.putText(frame, v.strip(), (20, IMG_H - (len(self.transcript_curr_message) * 25) + (20 * (i) + (5 * i))), cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv.LINE_AA)
+
+            self.transcriptTimeout += 1
+
         return frame
     
     
@@ -153,7 +175,7 @@ class VirtualWebcam():
             self.blockFrame = cv.blur(frame, (131,131))
             
             if (notPresent):
-                self.blockFrame = cv.putText(self.blockFrame, 'LEFT THE SCREEN', (20, IMG_H//2), cv.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv.LINE_AA)
+                self.blockFrame = cv.putText(self.blockFrame, 'LEFT THE SCREEN', (50, 50), cv.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv.LINE_AA)
         
         # Turn off the mic 
         if (self.controlMic):
@@ -244,5 +266,10 @@ def convert2RGBA(frame):
 
 
 t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=False)
+<<<<<<< HEAD
 t.startPython()
 #t.start()
+=======
+#t.startPython()
+t.start()
+>>>>>>> 02926b543d37d15be63cac9ea03249f27ac73474

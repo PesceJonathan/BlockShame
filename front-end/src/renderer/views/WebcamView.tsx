@@ -10,8 +10,9 @@ const WebcamViewStyled = styled.div`
 `;
 
 const Title = styled.h1`
+  font-weight: 400;
   margin: 15px 15px 0px 15px;
-  font-size: 24px;
+  font-size: 20px;
 `;
 
 const WebcamView = () => {
@@ -21,7 +22,7 @@ const WebcamView = () => {
     <WebcamViewStyled>
       <Title>Webcam</Title>
       <MenuItem_
-        optionName={"Detect User is away"}
+        optionName={"Detect when user is away"}
         optionDescription={"Turns the camera off when the user is no longer on the camera"}
         toggled={false}
         onToggle={(value: boolean) => {
@@ -34,7 +35,7 @@ const WebcamView = () => {
         }}
       />
       <MenuItem_
-        optionName={"Detect User is sleeping"}
+        optionName={"Detect when user is sleeping"}
         optionDescription={"Turns the camera off when the user is sleeping"}
         toggled={false}
         onToggle={(value: boolean) => {
@@ -47,7 +48,7 @@ const WebcamView = () => {
         }}
       />
       <MenuItem_
-        optionName={"Detect User is registered"}
+        optionName={"Only show registered user"}
         optionDescription={"Turn the camera off when we detect the presence of another user than the registered one"}
         toggled={false}
         onToggle={(value: boolean) => {
@@ -60,7 +61,7 @@ const WebcamView = () => {
         }}
       />
       <MenuItem_
-        optionName={"Show custom image"}
+        optionName={"Display custom unavailable image"}
         optionDescription={"Show a custom image when the user is away"}
         toggled={false}
         filePicker={true}

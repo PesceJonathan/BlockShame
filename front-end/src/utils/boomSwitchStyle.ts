@@ -20,7 +20,7 @@ export default (theme: any) => {
         color: "#fff",
         transform: `translateX(calc(${width} - ${size} - ${pxToRem(2 * gap)}))`,
         "& + $track": {
-          backgroundColor: "#192861",
+          backgroundColor: "#1f1f1f",
           opacity: 1,
           border: "none",
         },

@@ -22,11 +22,13 @@ const Item = styled.div`
 `;
 
 const Title = styled.h3`
+  font-size: 18px;
   margin: 0;
 `;
 
 const Desc = styled.h4`
-  font-weight: 300;
+  font-weight: 400;
+  font-size: 15px;
   margin: 0;
 `;
 
