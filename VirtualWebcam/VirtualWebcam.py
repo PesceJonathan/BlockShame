@@ -84,6 +84,7 @@ class VirtualWebcam():
                 
                 if (self.startLookAwayTime is not None):
                     writeTimeFrame(self.startLookAwayTime, datetime.now())
+                    self.startLookAwayTime = None
                 
                 if (self.controlMic):
                     turnOnMic()
@@ -217,12 +218,12 @@ def turnOnMic():
     thread.start()
 
 def appendToCSV(startTime, endTime):
-    with open("ConcentrationData.csv","a+", newline='') as file:
+    with open("./Data/ConcentrationData.csv","a+", newline='') as file:
         csvWriter = csv.writer(file, delimiter=',')
         csvWriter.writerow([startTime, endTime])
 
 def createCSV():
-    with open("ConcentrationData.csv","w+", newline='') as file:
+    with open("./Data/ConcentrationData.csv","w+", newline='') as file:
         csvWriter = csv.writer(file, delimiter=',')
         csvWriter.writerows([["StartTime", "EndTime"], [datetime.now(), None]])
         
