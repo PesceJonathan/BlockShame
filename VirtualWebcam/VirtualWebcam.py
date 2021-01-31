@@ -1,3 +1,6 @@
+from threading import Thread 
+from datetime import datetime 
+import csv
 import cv2 as cv
 import pyvirtualcam
 import numpy as np
@@ -12,7 +15,7 @@ IMG_H = 480
 WM_APPCOMMAND = 0x319
 APPCOMMAND_MIC_MAX = 0x1a
 APPCOMMAND_MIC_MIN = 0x19
-ERROR_THRESHOLD = 5
+ERROR_THRESHOLD = 8
 
 class VirtualWebcam():
     
@@ -25,6 +28,8 @@ class VirtualWebcam():
         self.notPresentCounter = 0
         self.NotUser = False
         self.transcript_queue = Queue()
+        self.startLookAwayTime = None
+        
         # Import all the cascades
         self.face_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_frontalface_default.xml')
         self.open_eyes_cascade = cv.CascadeClassifier(str(pathlib.Path(__file__).resolve().parent)  + './Haarcascades/haarcascade_eye.xml')
@@ -36,7 +41,10 @@ class VirtualWebcam():
             self.face_recognizer.read(str(pathlib.Path(__file__).resolve().parent)  + '/Data/JonathanPesce_Model.yml')
         else:
             self.face_recognizer = None
-          
+        
+        # Create the csv that will contain the concentration data
+        createCSV()
+            
             
     def start(self):
         # Use OpenCV to grab the webcam video feed
@@ -65,18 +73,23 @@ class VirtualWebcam():
         cv.waitKey(0)
         video_feed.release()
 
-       
-
         
     def processFrame(self, video_feed, counter, isPython=False):
         # Read the frame from the webcam
         isTrue, frame = video_feed.read()
         
         if (counter % 5 == 0):
-            if (self.updateShouldShowCame(frame, counter % 15 == 0 and self.face_recognizer is not None) == False):
+            if (self.updateShouldShowCame(frame, counter == 30 and self.face_recognizer is not None) == False):
                 frame = self.getBlockFrame(frame, self.notPresent)
+                
+                if (self.startLookAwayTime is None):
+                    self.startLookAwayTime = datetime.now()
+                
             elif (self.blockFrame is not None):
                 self.blockFrame = None
+                
+                if (self.startLookAwayTime is not None):
+                    writeTimeFrame(self.startLookAwayTime, datetime.now())
                 
                 if (self.controlMic):
                     turnOnMic()
@@ -111,11 +124,9 @@ class VirtualWebcam():
                 label, confidence = self.face_recognizer.predict(faces_roi)
                 
                 if (label != 1):
-                    print("NOT USER")
                     self.NotUser = True
                     return False
                 else:
-                    print("Is User")
                     self.NotUser = False
         elif (self.NotUser == True):
             return False
@@ -129,6 +140,7 @@ class VirtualWebcam():
             shouldTurnOff = True
              
         self.notPresentCounter = (0, self.notPresentCounter + 1)[shouldTurnOff]
+        
         return self.notPresentCounter < ERROR_THRESHOLD
     
     
@@ -196,7 +208,8 @@ class VirtualWebcam():
         
         cv.waitKey(0)
         video_feed.release()
-  
+        writeTimeFrame(None, datetime.now())
+        
 
 def toggleMic(val):
     win32api.SendMessage(-1, WM_APPCOMMAND, 0x30292, val * 0x10000)
@@ -207,6 +220,21 @@ def turnOffMic():
     
 def turnOnMic():
     thread = Thread(target=toggleMic, args=([APPCOMMAND_MIC_MAX]))
+    thread.start()
+
+def appendToCSV(startTime, endTime):
+    with open("ConcentrationData.csv","a+", newline='') as file:
+        csvWriter = csv.writer(file, delimiter=',')
+        csvWriter.writerow([startTime, endTime])
+
+def createCSV():
+    with open("ConcentrationData.csv","w+", newline='') as file:
+        csvWriter = csv.writer(file, delimiter=',')
+        csvWriter.writerows([["StartTime", "EndTime"], [datetime.now(), None]])
+        
+
+def writeTimeFrame(startTime, endTime):
+    thread = Thread(target=appendToCSV, args=([startTime, endTime]))
     thread.start()
 
 def convert2RGBA(frame):
