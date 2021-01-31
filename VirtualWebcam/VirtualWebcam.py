@@ -11,6 +11,7 @@ from threading import Thread
 from queue import Queue
 from SpeechToText import main
 import textwrap 
+
 # Constants
 IMG_W = 640
 IMG_H = 480
@@ -107,14 +108,12 @@ class VirtualWebcam():
         
         if(self.transcript_queue.qsize() > 0):
             self.transcript_curr_message = self.transcript_queue.get()
-            print("T: " + self.transcript_curr_message)
             self.transcript_curr_message = textwrap.wrap(self.transcript_curr_message, width=30)
             self.transcriptTimeout = 0
         
         if(self.transcriptTimeout is not None):
             if self.transcriptTimeout < 2 * 15 * len(self.transcript_curr_message):
                 for i, v in enumerate(self.transcript_curr_message):
-                    print(v)
                     frame = cv.putText(frame, v.strip(), (20, IMG_H - (len(self.transcript_curr_message) * 25) + (20 * (i) + (5 * i))), cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv.LINE_AA)
 
             self.transcriptTimeout += 1
@@ -265,11 +264,7 @@ def convert2RGBA(frame):
 
 
 
-t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=False)
-<<<<<<< HEAD
-t.startPython()
-#t.start()
-=======
+t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=True)
 #t.startPython()
 t.start()
->>>>>>> 02926b543d37d15be63cac9ea03249f27ac73474
+
