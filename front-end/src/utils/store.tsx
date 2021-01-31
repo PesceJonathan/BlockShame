@@ -131,7 +131,7 @@ const StateProvider = (props: { children: any }) => {
         return {
           ...state,
           audioSettings: {
-            ...state.videoSettings,
+            ...state.audioSettings,
             muteAudioWhenVideoIsDisabled: action.payload,
           },
         };

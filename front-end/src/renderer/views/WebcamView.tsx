@@ -4,12 +4,12 @@ import styled from "styled-components";
 import { ActionType, store } from "_/utils/store";
 import MenuItem_ from "../MenuItem_";
 
-const WebcamViewStyled = styled.div`
+export const WebcamViewStyled = styled.div`
   margin: 0 8px;
   width: 100%;
 `;
 
-const Title = styled.h1`
+export const Title = styled.h1`
   font-weight: 400;
   margin: 15px 15px 0px 15px;
   font-size: 20px;

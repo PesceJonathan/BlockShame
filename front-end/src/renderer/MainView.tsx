@@ -28,6 +28,7 @@ const MainView = (props: any) => {
     currentView,
     videoSettings,
     accessibilitySettings,
+    audioSettings
   } = React.useContext(store);
 
   React.useEffect(() => {
@@ -40,6 +41,11 @@ const MainView = (props: any) => {
     console.log("Sending video config", videoSettings);
     sendMessage({ webcam: videoSettings }, "setting_change");
   }, [videoSettings]);
+
+  React.useEffect(() => {
+    console.log("Sending audio config", audioSettings);
+    sendMessage({ audio: audioSettings }, "setting_change");
+  }, [audioSettings]);
 
   React.useEffect(() => {
     console.log("Sending access config", accessibilitySettings);
