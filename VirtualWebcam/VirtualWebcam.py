@@ -1,5 +1,6 @@
 from threading import Thread 
-from datetime import datetime
+from datetime import datetime 
+import csv
 import cv2 as cv
 import pyvirtualcam
 import numpy as np
@@ -205,6 +206,15 @@ def turnOffMic():
 def turnOnMic():
     thread = Thread(target=toggleMic, args=([APPCOMMAND_MIC_MAX]))
     thread.start()
+
+def appendToCSV(startTime, endTime):
+    with open("BubbleDataCTRM.csv","a+", newline='') as file:
+        csvWriter = csv.writer(file, delimiter=',')
+        csvWriter.writerow([startTime, endTime])
+
+
+def writeTimeFrame(startTime, endTime):
+    thread = Thread(target=appendToCSV, args=([startTime, endTime]))
 
 def convert2RGBA(frame):
     # convert to RGBA
