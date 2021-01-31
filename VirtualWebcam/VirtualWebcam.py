@@ -90,6 +90,7 @@ class VirtualWebcam():
                     turnOnMic()
         elif (self.blockFrame is not None):
             frame = self.blockFrame
+            cv.flip(frame, -1)
         
         # If we are pushing to OBS convert to RGBA
         if (isPython == False):
@@ -238,11 +239,10 @@ def convert2RGBA(frame):
     out_frame_rgba = np.zeros((IMG_H, IMG_W, 4), np.uint8)
     out_frame_rgba[:, :, :3] = out_frame
     out_frame_rgba[:, :, 3] = 255
-    cv.flip(out_frame_rgba, -1)
     return out_frame_rgba
 
 
 
 t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=False)
-t.startPython()
-#t.start()
+#t.startPython()
+t.start()
