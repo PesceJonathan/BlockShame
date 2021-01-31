@@ -12,6 +12,8 @@ export enum ActionType {
   setAwayBackgroundPath,
   toggleCustomAwayImage,
   toggleAccesibilityConfig,
+  toggleVideoSleepingDetection,
+  toggleNotUserDetection
 }
 
 interface Action {
@@ -26,6 +28,8 @@ interface StoreState {
     videoAwaydetection: Boolean,
     useCustomAwayImage: Boolean,
     customImagePath: string,
+    videoSleepingDetection: Boolean,
+    videoNotUserDetection: Boolean,
   };
   accessibilitySettings: {
     aslTranslation: Boolean;
@@ -37,6 +41,8 @@ const initialState: StoreState = {
   videoSettings: {
     videoAwaydetection: true,
     useCustomAwayImage: false,
+    videoSleepingDetection: false,
+    videoNotUserDetection: false,
     customImagePath: ''
   },
   accessibilitySettings: {
@@ -89,6 +95,26 @@ const StateProvider = (props: { children: any }) => {
           videoSettings: {
             ...state.videoSettings,
             customImagePath: action.payload,
+          },
+        };
+
+        case ActionType.toggleVideoSleepingDetection:
+        console.log(state, action);
+        return {
+          ...state,
+          videoSettings: {
+            ...state.videoSettings,
+            videoSleepingDetection: action.payload,
+          },
+        };
+
+        case ActionType.toggleNotUserDetection:
+        console.log(state, action);
+        return {
+          ...state,
+          videoSettings: {
+            ...state.videoSettings,
+            videoNotUserDetection: action.payload,
           },
         };
       default:

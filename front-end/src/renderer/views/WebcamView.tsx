@@ -34,6 +34,32 @@ const WebcamView = () => {
         }}
       />
       <MenuItem_
+        optionName={"Detect User is sleeping"}
+        optionDescription={"Turns the camera off when the user is sleeping"}
+        toggled={false}
+        onToggle={(value: boolean) => {
+          if (context && context.dispatch) {
+            context.dispatch({
+              type: ActionType.toggleVideoSleepingDetection,
+              payload: value,
+            });
+          }
+        }}
+      />
+      <MenuItem_
+        optionName={"Detect User is registered"}
+        optionDescription={"Turn the camera off when we detect the presence of another user than the registered one"}
+        toggled={false}
+        onToggle={(value: boolean) => {
+          if (context && context.dispatch) {
+            context.dispatch({
+              type: ActionType.toggleNotUserDetection,
+              payload: value,
+            });
+          }
+        }}
+      />
+      <MenuItem_
         optionName={"Show custom image"}
         optionDescription={"Show a custom image when the user is away"}
         toggled={false}
