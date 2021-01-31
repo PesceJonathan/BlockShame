@@ -109,14 +109,13 @@ class VirtualWebcam():
                 
                 if (label != 1):
                     print("NOT USER")
-                    self.NotUser = False
+                    self.NotUser = True
                     return False
                 else:
                     print("Is User")
-                    self.NotUser = True
-        else:
-            if (self.NotUser == False):
-                return False
+                    self.NotUser = False
+        elif (self.NotUser == True):
+            return False
         
         # If user is not present turn off the webcam
         if (self.notPresent and len(face_rects) < 1):
@@ -216,6 +215,6 @@ def convert2RGBA(frame):
     cv.flip(out_frame_rgba, -1)
     return out_frame_rgba
 
-t = VirtualWebcam(notPresent=False, isSleeping=False, errImgPath='ErrorImage.png', controlMic=False, faceRecognition=True)
+t = VirtualWebcam(notPresent=True, isSleeping=True, errImgPath='ErrorImage.png', controlMic=True, faceRecognition=False)
 #t.startPython()
 t.start()
