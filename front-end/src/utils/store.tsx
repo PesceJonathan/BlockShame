@@ -38,6 +38,7 @@ interface StoreState {
   }
   accessibilitySettings: {
     aslTranslation: Boolean;
+    audioTranscriber: Boolean;
   };
 }
 
@@ -45,7 +46,7 @@ const initialState: StoreState = {
   currentView: View.Webcam,
   videoSettings: {
     useCustomAwayImage: false,
-    customImagePath: '',
+    customImagePath: 'E:\Hackathon\BlockShame\VirtualWebcam\ErrorImage.png',
     videoAwaydetection: true,
     videoSleepingDetection: false,
     videoNotUserDetection: false,
@@ -55,6 +56,7 @@ const initialState: StoreState = {
   },
   accessibilitySettings: {
     aslTranslation: false,
+    audioTranscriber: false
   },
 };
 

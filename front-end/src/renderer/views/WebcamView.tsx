@@ -24,7 +24,7 @@ const WebcamView = () => {
       <MenuItem_
         optionName={"Detect when user is away"}
         optionDescription={"Turns the camera off when the user is no longer on the camera"}
-        toggled={false}
+        toggled={true}
         onToggle={(value: boolean) => {
           if (context && context.dispatch) {
             context.dispatch({

@@ -8,7 +8,7 @@ import win32api
 import pathlib
 import math
 from threading import Thread
-from queue import Queue
+from queue import Queue, Empty
 from SpeechToText import main
 import textwrap
 
@@ -21,19 +21,24 @@ APPCOMMAND_MIC_MIN = 0x19
 ERROR_THRESHOLD = 8
 
 
-class VirtualWebcam:
+class VirtualWebcam(Thread):
     def __init__(
         self,
+        lock,
         errImgPath=None,
         notPresent=False,
         isSleeping=False,
         controlMic=False,
+        transcribe=False,
         faceRecognition=False,
+        asl_regconition=False,
     ):
         self.notPresent = notPresent
         self.isSleeping = isSleeping
         self.controlMic = controlMic
         self.errImg = (None, cv.imread(errImgPath))[errImgPath is not None]
+
+        self.transcribe = transcribe
         self.blockFrame = None
         self.notPresentCounter = 0
         self.NotUser = False
@@ -41,6 +46,7 @@ class VirtualWebcam:
         self.startLookAwayTime = None
         self.transcript_curr_message = ""
         self.transcriptTimeout = None
+        self.message_queue = None
         # Import all the cascades
         self.face_cascade = cv.CascadeClassifier(
             str(pathlib.Path(__file__).resolve().parent)
@@ -59,7 +65,7 @@ class VirtualWebcam:
             + "./Haarcascades/haarcascade_lefteye_2splits.xml"
         )
         self.faceRecognition = faceRecognition
-        if faceRecognition:
+        if faceRecognition or False:
             print("NOT NONE")
             self.face_recognizer = cv.face.LBPHFaceRecognizer_create()
             self.face_recognizer.read(
@@ -68,53 +74,92 @@ class VirtualWebcam:
             )
         else:
             self.face_recognizer = None
+        self.asl_regconition = asl_regconition
+        self.speech_thread = None
+        self.lock = lock
 
         # Create the csv that will contain the concentration data
         createCSV()
 
     def sync_config(self):
-        value = self.transcript_queue.get()
-        settings = {}
-        if type(value) == set:
-            if value[0] == "webcam":
-                settings = value[1]
-                self.notPresent = (
-                    settings.get("videoAwaydetection", self.notPresent)
-                    # if settings.get("videoAwaydetection", False)
-                    # else self.notPresent
-                )
+        try:
+            if self.message_queue.qsize() > 0:
+                value = self.message_queue.get()
+                print(f"Value: {value}")
+                settings = value.get("payload")
+                self.lock.acquire()
+                if value.get("type") == "webcam":
+                    print(f"SYNC------------Webcam: {settings}")
+                    self.notPresent = (
+                        settings.get("videoAwaydetection", self.notPresent)
+                        # if settings.get("videoAwaydetection", False)
+                        # else self.notPresent
+                    )
+                    if settings.get("useCustomAwayImage"):
+                        self.errImg = (
+                            cv.imread(settings.get("customImagePath"))
+                            if settings.get("useCustomAwayImage")
+                            else self.errImg
+                        )
+                    else:
+                        self.errImg = None
 
-                self.errImg = (
-                    settings.get("customImagePath", self.errImg)
-                    # if settings.get("customImagePath")
-                    # else self.errImg
-                )
+                    self.isSleeping = (
+                        settings.get("videoSleepingDetection", self.isSleeping)
+                        # if settings.get("videoSleepingDetection")
+                        # else self.isSleeping
+                    )
 
-                self.isSleeping = (
-                    settings.get("videoSleepingDetection", self.isSleeping)
-                    # if settings.get("videoSleepingDetection")
-                    # else self.isSleeping
-                )
+                    self.faceRecognition = settings.get(
+                        "videoNotUserDetection", self.faceRecognition
+                    )
 
-                self.faceRecognition = settings.get(
-                    "videoNotUserDetection", self.faceRecognition
-                )
+                    print("---------------")
+                    print(self.notPresent)
+                    print(self.errImg)
+                    print(self.isSleeping)
+                    print(self.faceRecognition)
+                    print("---------------")
+                elif value.get("type") == "accessibility":
+                    self.transcribe = settings.get(
+                        "audioTranscriber", self.transcribe
+                    )
+                    self.toggle_audio_thread()
 
-            
-
-            elif value[0] == "audio":
-                self.controlMic = settings.get(
-                    "muteAudioWhenVideoIsDisabled", self.controlMic
-                )
-            else:
-                pass
+                    print("---------------")
+                    print(self.asl_regconition)
+                    print(self.transcribe)
+                    print("---------------")
+                elif value.get("type") == "audio":
+                    self.controlMic = settings.get(
+                        "muteAudioWhenVideoIsDisabled", self.controlMic
+                    )
+                    print("---------------")
+                    print(self.controlMic)
+                    print("---------------")
+                else:
+                    pass
+                self.lock.release()
+        except Empty:
+            pass
+    
+    def toggle_audio_thread(self):
+        if not self.speech_thread:
+            if self.transcribe:
+                self.speech_thread = Thread(target=main, args=(self.transcript_queue,), daemon = True)
+                self.speech_thread.start()
+        else:
+            if self.transcribe:
+                self.speech_thread.__exit__()
 
     def start(self, message_queue):
+        self.message_queue = message_queue
         # Use OpenCV to grab the webcam video feed
         # video_feed = cv.VideoCapture(0)
-        # # speech_thread = Thread(target=main, args=(self.transcript_queue,))
-        # # speech_thread.start()
-        # # Check if the webcam can be opened
+        if self.transcribe:
+            self.speech_thread = Thread(target=main, args=(self.transcript_queue,))
+            self.speech_thread.start()
+        # Check if the webcam can be opened
         # if (video_feed.isOpened() == False):
         #     return "ERROR - Could not connect to webcam!!!"
 
@@ -144,10 +189,12 @@ class VirtualWebcam:
 
         counter = 0
         while True:
-            self.sync_config()
+            # self.sync_config()
             frame = self.processFrame(video_feed, counter, isPython=True)
 
             counter = (counter + 1, 0)[counter == 30]
+            if counter == 29:
+                self.sync_config()
 
             cv.imshow("Title", frame)
             cv.waitKey(1)
@@ -189,33 +236,34 @@ class VirtualWebcam:
         if isPython == False:
             frame = convert2RGBA(frame)
 
-        if self.transcript_queue.qsize() > 0:
-            self.transcript_curr_message = self.transcript_queue.get()
-            self.transcript_curr_message = textwrap.wrap(
-                self.transcript_curr_message, width=30
-            )
-            self.transcriptTimeout = 0
+        if self.transcribe:
+            if self.transcript_queue.qsize() > 0:
+                self.transcript_curr_message = self.transcript_queue.get()
+                self.transcript_curr_message = textwrap.wrap(
+                    self.transcript_curr_message, width=30
+                )
+                self.transcriptTimeout = 0
 
-        if self.transcriptTimeout is not None:
-            if self.transcriptTimeout < 2 * 15 * len(self.transcript_curr_message):
-                for i, v in enumerate(self.transcript_curr_message):
-                    frame = cv.putText(
-                        frame,
-                        v.strip(),
-                        (
-                            20,
-                            IMG_H
-                            - (len(self.transcript_curr_message) * 25)
-                            + (20 * (i) + (5 * i)),
-                        ),
-                        cv.FONT_HERSHEY_SIMPLEX,
-                        0.8,
-                        (255, 255, 255),
-                        2,
-                        cv.LINE_AA,
-                    )
+            if self.transcriptTimeout is not None:
+                if self.transcriptTimeout < 2 * 15 * len(self.transcript_curr_message):
+                    for i, v in enumerate(self.transcript_curr_message):
+                        frame = cv.putText(
+                            frame,
+                            v.strip(),
+                            (
+                                20,
+                                IMG_H
+                                - (len(self.transcript_curr_message) * 25)
+                                + (20 * (i) + (5 * i)),
+                            ),
+                            cv.FONT_HERSHEY_SIMPLEX,
+                            0.8,
+                            (255, 255, 255),
+                            2,
+                            cv.LINE_AA,
+                        )
 
-            self.transcriptTimeout += 1
+                self.transcriptTimeout += 1
 
         return frame
 
